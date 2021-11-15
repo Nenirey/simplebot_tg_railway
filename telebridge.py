@@ -1,6 +1,6 @@
 import simplebot
 from simplebot.bot import DeltaBot, Replies
-from deltachat import Chat, Contact, Message
+from deltachat import Chat, Contact, Message, const
 import sys
 import os
 from telethon.sessions import StringSession
@@ -697,15 +697,15 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               if hasattr(m,'action') and m.action:
                  mservice = '_system message_\n'
                  if isinstance(m.action, types.MessageActionPinMessage):
-                    mservice += 'Anclo un mensaje!'
+                    mservice += '_Ancló el mensaje_\n'
                  elif isinstance(m.action, types.MessageActionChatAddUser):
-                    mservice += 'Agrego un usuario!'
+                    mservice += '_Agregó un usuario_\n'
                  elif isinstance(m.action, types.MessageActionChatJoinedByLink):
-                    mservice += 'Se unio al grupo!'
+                    mservice += '_Se unió al grupo_\n'
                  elif isinstance(m.action, types.MessageActionChatDeleteUser):
-                    mservice += 'Elimino un usuario!'
+                    mservice += '_Eliminó un usuario_\n'
                  elif isinstance(m.action, types.MessageActionChannelCreate):
-                    mservice += 'Se creo el grupo/canal!'   
+                    mservice += '_Se creo el grupo/canal_\n'   
                     
               #extract sender name
               if hasattr(m,'sender') and m.sender and hasattr(m.sender,'first_name') and m.sender.first_name:
@@ -893,25 +893,43 @@ async def echo_filter(message, replies):
           target = int(id_chat)
        else:
           target = id_chat
+       mquote = ''
+       if message.quote:
+          if message.quote.is_gif():
+             mquote += '[GIF]'
+          elif message.quote.is_image():
+             mquote += '[PHOTO]'
+          elif message.quote.is_audio():
+              mquote += '[AUDIO]'
+          elif message.quote.is_video():
+              mquote += '[VIDEO]'
+          elif message.quote.is_file():
+              mquote += '[FILE]'                
+          mquote += ' '+message.quote.text
+          if len(mquote)>65:
+             mquote = mquote[0:65]+'...'
+             
+          mquote = '>'+mquote.replace('\n','\n>')+'\n\n'
+       mtext = mquote+message.text     
        if message.filename:
           if message.is_audio() or message.filename.lower().endswith('.aac'):
              await client.send_file(target, message.filename, voice_note=True)
           else:
-             if len(message.text) > 1024:
-                await client.send_file(target, message.filename, caption = message.text[0:1024])    
-                for x in range(1024, len(message.text), 1024):
-                    await client.send_message(target, message.text[x:x+1024])
+             if len(mtext) > 1024:
+                await client.send_file(target, message.filename, caption = mtext[0:1024])    
+                for x in range(1024, len(mtext), 1024):
+                    await client.send_message(target, mtext[x:x+1024])
              else:       
-                await client.send_file(target, message.filename, caption = message.text)
+                await client.send_file(target, message.filename, caption = mtext)
        else:
-          if len(message.text) > 4096:
-             for x in range(0, len(message.text), 4096): 
-                 await client.send_message(target, message.text[x:x+4096])
+          if len(mtext) > 4096:
+             for x in range(0, len(mtext), 4096): 
+                 await client.send_message(target, mtext[x:x+4096])
           else:
-             await client.send_message(target,message.text)
+             await client.send_message(target,mtext)
        await client.disconnect()
     except:
-       await client(SendMessageRequest(target, message.text))
+       await client(SendMessageRequest(target, mtext))
        code = str(sys.exc_info())
        replies.add(text=code)
 
