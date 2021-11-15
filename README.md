@@ -1,2 +1,2 @@
-# simplebot_tg
+# simplebot_tg_railway
 Telegram/DeltaChat Bridge
