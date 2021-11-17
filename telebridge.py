@@ -1,9 +1,11 @@
 import simplebot
+import deltachat
 from simplebot.bot import DeltaBot, Replies
 from deltachat import Chat, Contact, Message
 from typing import Optional
 import sys
 import os
+import psutil
 from telethon.sessions import StringSession
 from telethon import TelegramClient as TC
 from telethon import functions, types
@@ -37,6 +39,9 @@ login_hash = os.getenv('LOGIN_HASH')
 admin_addr = os.getenv('ADMIN')
 white_list = None
 black_list = None
+
+MAX_SIZE_DOWN = 10485760
+MIN_SIZE_DOWN = 655360
 
 #use env to add to the lists like "user1@domine.com user2@domine.com" with out ""
 if os.getenv('WHITE_LIST'):
@@ -77,17 +82,26 @@ loop = asyncio.new_event_loop()
 @simplebot.hookimpl(tryfirst=True)
 def deltabot_incoming_message(message, replies) -> Optional[bool]:
     """Check that the sender is not in the black or white list."""
-    if white_list and message.get_sender_contact().addr not in white_list:       
+    if white_list and message.get_sender_contact().addr not in white_list:
+       print('Usuario '+str(message.get_sender_contact().addr)+' no esta en la lista blanca')
        return True
     if black_list and message.get_sender_contact().addr in black_list:
+       print('Usuario '+str(message.get_sender_contact().addr)+' esta en la lista negra')  
        return True
     return None
+
+@simplebot.hookimpl
+def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
+    if actor:
+       print('Miembro '+str(contact.addr)+' agregado por '+str(actor.addr)+' chat: '+str(chat.get_name()))
+    else:
+       print('My self!')
 
 @simplebot.hookimpl
 def deltabot_init(bot: DeltaBot) -> None:
     bot.account.set_config("displayname","Telegram Bridge")
     bot.account.set_avatar('telegram.jpeg')
-    bot.account.set_config("mdns_enabled","0")
+    bot.account.set_config("mdns_enabled","0")  
     bot.commands.register(name = "/eval" ,func = eval_func, admin = True)
     bot.commands.register(name = "/start" ,func = start_updater, admin = True)
     bot.commands.register(name = "/stop" ,func = stop_updater, admin = True)
@@ -502,10 +516,11 @@ async def updater(bot, payload, replies, message):
        all_chats = await client.get_dialogs(ignore_migrated = True)
        chats_limit = 5
        filtro = payload.replace(' ','_')
+       filtro = filtro.replace('@','')
        ya_agregados = '' 
        replies.add(text = 'Obteniendo chats...'+filtro)
        for d in all_chats:
-           if hasattr(d.entity,'username'):
+           if hasattr(d.entity,'username') and d.entity.username:
               uname = str(d.entity.username)
            else:
               uname = 'None'
@@ -519,7 +534,7 @@ async def updater(bot, payload, replies, message):
            else:
               private_only = False
            if payload!='' and payload.lower()!='#privates':
-              if ttitle.lower().find(payload.lower())>=0 or tid is payload or uname.lower() is filtro.lower():
+              if ttitle.lower().find(payload.lower())>=0 or tid == payload or uname.lower() == filtro.lower():
                  find_only = False
               else:
                  find_only = True
@@ -724,11 +739,11 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                  if isinstance(m.action, types.MessageActionPinMessage):
                     mservice += '_Ancló el mensaje_\n'
                  elif isinstance(m.action, types.MessageActionChatAddUser):
-                    mservice += '_Agregó un usuario_\n'
-                 elif isinstance(m.action, types.MessageActionChatJoinedByLink):
                     mservice += '_Se unió al grupo_\n'
+                 elif isinstance(m.action, types.MessageActionChatJoinedByLink):
+                    mservice += '_Se unió al grupo usando un enlace de invitación_\n'
                  elif isinstance(m.action, types.MessageActionChatDeleteUser):
-                    mservice += '_Eliminó un usuario_\n'
+                    mservice += '_Salió del grupo_\n'
                  elif isinstance(m.action, types.MessageActionChannelCreate):
                     mservice += '_Se creo el grupo/canal_\n'   
                     
@@ -761,7 +776,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               down_button = "\nDescargar: /down_"+str(m.id)+"\nReenviar: /forward_"+str(m.id)+"_DirectLinkGeneratorbot\nReenviar: /forward_"+str(m.id)+"_aiouploaderbot"          
               #check if message have document
               if hasattr(m,'document') and m.document:
-                 if m.document.size<512000 or (is_down and m.document.size<20971520):
+                 if m.document.size<MIN_SIZE_DOWN or (is_down and m.document.size<MAX_SIZE_DOWN):
                     #print('Descargando archivo...')
                     file_attach = await client.download_media(m.document, contacto)
                     #Try to convert all tgs sticker to png
@@ -798,7 +813,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                            if hasattr(sz,'size') and sz.size:
                               f_size = sz.size
                               break
-                    if f_size<512000 or (is_down and f_size<20971520):
+                    if f_size<MIN_SIZE_DOWN or (is_down and f_size<MAX_SIZE_DOWN):
                        #print('Descargando foto...') 
                        file_attach = await client.download_media(m.media, contacto)
                        myreplies.add(text = send_by+"\n"+str(text_message)+html_buttons+msg_id, filename = file_attach, chat = chat_id)
@@ -818,7 +833,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                                  if hasattr(sz,'size') and sz.size:
                                     f_size = sz.size
                                     break
-                             if f_size<512000 or (is_down and f_size<20971520):
+                             if f_size<MIN_SIZE_DOWN or (is_down and f_size<MAX_SIZE_DOWN):
                                 #print('Descargando foto web...')
                                 file_attach = await client.download_media(m.media, contacto)
                              else:
@@ -829,7 +844,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                        if hasattr(m.media.webpage,'document') and m.media.webpage.document:
                           if hasattr(m.media.webpage.document,'size') and m.media.webpage.document.size:
                              f_size = m.media.webpage.document.size
-                             if f_size<512000 or (is_down and f_size<20971520):
+                             if f_size<MIN_SIZE_DOWN or (is_down and f_size<MAX_SIZE_DOWN):
                                 #print('Descargando archivo web...')    
                                 file_attach = await client.download_media(m.media, contacto)
                              else:
@@ -849,11 +864,11 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                           wurl = m.media.webpage.url
                        else:
                           wurl = ''
-                       
+      
                        if file_attach!= '':
                           myreplies.add(text = send_by+str(wtitle)+"\n"+wmessage+str(wurl)+html_buttons+msg_id, filename = file_attach, chat = chat_id)
                        else:
-                          myreplies.add(text = send_by+str(wtitle)+"\n"+wmessage+str(wurl)+down_button+html_buttons+msg_id, chat = chat_id)
+                          myreplies.add(text = send_by+str(wtitle)+"\n"+wmessage+str(wurl)+(down_button if f_size>0 else "")+html_buttons+msg_id, chat = chat_id)
                     else:
                        no_media = True
                    
@@ -1196,10 +1211,10 @@ async def join_chats(bot, message, replies, payload):
         replies.add(text=code)
 
 def async_join_chats(bot, message, replies, payload):
-    """Join to telegram chats by username or private link. Example: /join @usernamegroup
+    """Join to telegram chats by username or private link. Example: /join usernamegroup
     or /join https://t.me/joinchat/invitehashtoprivatechat"""
     loop.run_until_complete(join_chats(bot = bot, message = message, replies = replies, payload = payload))
-    loop.run_until_complete(updater(bot=bot, payload=payload.replace('@',''), replies=replies, message=message))
+    loop.run_until_complete(updater(bot=bot, payload=payload, replies=replies, message=message))
     if message.get_sender_contact().addr in logindb:
        async_save_delta_chats(replies = replies, message = message)
 
@@ -1321,7 +1336,7 @@ async def auto_load(bot, message, replies):
                    except:
                       code = str(sys.exc_info())
                       print(code)
-                   time.sleep(0.125) 
+                   time.sleep(0.100) 
         except:
            print('Error in autochatsdb dict')
         time.sleep(15)
@@ -1334,9 +1349,9 @@ def start_updater(bot, message, replies):
     if auto_load_task:
        if auto_load_task.done():
           is_done = True
-          replies.add(text='Las autodescargas ya se estan ejecutando!')
        else:
           is_done = False
+          replies.add(text='Las autodescargas ya se estan ejecutando!')  
     if is_done:
        auto_load_task = asyncio.run_coroutine_threadsafe(auto_load(bot=bot, message = message, replies = replies),tloop)
        replies.add(text='Las autodescargas se han iniciado!')
@@ -1375,6 +1390,28 @@ async def c_run(payload, replies, message):
 def async_run(payload, replies, message):
     """Run command inside a async TelegramClient def. Note that all code run with await prefix, results are maybe a coorutine. Example: /exec client.get_me()"""
     loop.run_until_complete(c_run(payload, replies, message))
+   
+@simplebot.command(admin=True)
+def stats(replies) -> None:
+    """Get bot and computer state."""
+    mem = psutil.virtual_memory()
+    swap = psutil.swap_memory()
+    disk = psutil.disk_usage(os.path.expanduser("~/.simplebot/"))
+    proc = psutil.Process()
+    botmem = proc.memory_full_info()
+    replies.add(
+        text="**🖥️ Computer Stats:**\n"
+        f"CPU: {psutil.cpu_percent(interval=0.1)}%\n"
+        f"Memory: {sizeof_fmt(mem.used)}/{sizeof_fmt(mem.total)}\n"
+        f"Swap: {sizeof_fmt(swap.used)}/{sizeof_fmt(swap.total)}\n"
+        f"Disk: {sizeof_fmt(disk.used)}/{sizeof_fmt(disk.total)}\n\n"
+        "**🤖 Bot Stats:**\n"
+        f"CPU: {proc.cpu_percent(interval=0.1)}%\n"
+        f"Memory: {sizeof_fmt(botmem.rss)}\n"
+        f"Swap: {sizeof_fmt(botmem.swap if 'swap' in botmem._fields else 0)}\n"
+        f"SimpleBot: {simplebot.__version__}\n"
+        f"DeltaChat: {deltachat.__version__}\n"
+    )   
 
 def sizeof_fmt(num: float) -> str:
     """Format size in human redable form."""
