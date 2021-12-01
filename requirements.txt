@@ -8,9 +8,11 @@ idna
 itsdangerous
 Jinja2
 requests
+deltachat==1.68
 git+https://github.com/Nenirey/Telethon@master#telethon
 git+https://github.com/simplebot-org/simplebot@master#simplebot
 mock
 git+https://gitlab.com/mattbas/python-lottie@master#lottie
 pillow
 cairosvg
+dropbox
