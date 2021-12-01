@@ -15,4 +15,5 @@ mock
 git+https://gitlab.com/mattbas/python-lottie@master#lottie
 pillow
 cairosvg
+psutil
 dropbox
