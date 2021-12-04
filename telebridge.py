@@ -183,8 +183,8 @@ def loadlogin():
        global logindb
        logindb=json.load(tf)
        tf.close()
-    for (key,_) in logindb.items():
-        loop.run_until_complete(load_delta_chats(contacto=key))
+       for (key,_) in logindb.items():
+           loop.run_until_complete(load_delta_chats(contacto=key))
     else:
        print("File "+LOGINFILE+" not exists!!!")
 #end secure save storage
