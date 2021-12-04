@@ -534,7 +534,7 @@ async def add_auto_chats(bot, replies, message):
              del autochatsdb[message.get_sender_contact().addr][message.chat.id]
              replies.add(text='Se ha desactivado la automatizacion en este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer!')
           else:
-             if len(autochatsdb[message.get_sender_contact().addr])>=MAX_AUTO_CHATS:
+             if len(autochatsdb[message.get_sender_contact().addr])>=MAX_AUTO_CHATS and not bot.is_admin(message.get_sender_contact()):
                 autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
                 for (key,_) in autochatsdb[message.get_sender_contact().addr].items():
                     del autochatsdb[message.get_sender_contact().addr][key]
@@ -999,8 +999,11 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                  if hasattr(m.reply_to,'reply_to_msg_id') and m.reply_to.reply_to_msg_id:
                     dc_mid = find_register_msg(contacto, dc_id, m.reply_to.reply_to_msg_id)
                     if dc_mid:
-                       quote = bot.account.get_message_by_id(dc_mid)
-                    else:
+                       try:
+                          quote = bot.account.get_message_by_id(dc_mid)
+                       except:
+                          print('Unregister dc_msg '+str(dc_mid))
+                    if not quote:
                        mensaje = await client.get_messages(target, ids = [m.reply_to.reply_to_msg_id])
                        if mensaje and mensaje[0]:
                           reply_text = ''
