@@ -48,7 +48,7 @@ bot_home = expanduser("~")
 white_list = None
 black_list = None
 
-MAX_AUTO_CHATS = 5
+MAX_AUTO_CHATS = 1
 MAX_SIZE_DOWN = 10485760
 MIN_SIZE_DOWN = 655360
 
@@ -183,8 +183,8 @@ def loadlogin():
        global logindb
        logindb=json.load(tf)
        tf.close()
-       for (key,_) in logindb.items():
-           loop.run_until_complete(load_delta_chats(contacto=key))
+    for (key,_) in logindb.items():
+        loop.run_until_complete(load_delta_chats(contacto=key))
     else:
        print("File "+LOGINFILE+" not exists!!!")
 #end secure save storage
@@ -364,8 +364,8 @@ async def chat_news(bot, payload, replies, message):
                           if hasattr(full_pchat,'user') and full_pchat.user:
                              send_by = '\n'+full_pchat.user.first_name+': '
                        except:
-                          print('Error obteniendo entidad '+str(uid))
-                          pchat = await client.get_entity(uid)
+                          print('Error obteniendo entidad '+str(d.message.from_id.user_id))
+                          pchat = await client.get_entity(d.message.from_id.user_id)
                           if hasattr(pchat, 'first_name') and pchat.first_name:
                              send_by = '\n'+str(pchat.first_name)+': '
                  if hasattr(d.message,'message') and d.message.message:
