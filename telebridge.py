@@ -28,6 +28,7 @@ import json
 import urllib.parse
 from datetime import datetime
 from threading import Event, Thread
+import copy
 #For telegram sticker stuff
 import lottie
 from lottie.importers import importers
@@ -213,6 +214,20 @@ def loadautochats():
        print("File "+AUTOCHATFILE+" not exists!!!")
 #end secure save storage
 
+def fixautochatsdb(bot):
+    cids = []
+    dchats = bot.account.get_chats()
+    for c in dchats:
+        cids.append(c.id)
+    tmpdict = copy.deepcopy(autochatsdb)
+    for (key, value) in tmpdict.items():
+        for (inkey, invalue) in value.items():
+            #print('Autodescarga de '+str(key)+' chat '+str(inkey))
+            if inkey not in cids:
+               print('El chat '+str(inkey)+' no existe en el bot')
+               del autochatsdb[key][inkey]
+
+
 @simplebot.hookimpl(tryfirst=True)
 def deltabot_incoming_message(message, replies) -> Optional[bool]:
     """Check that the sender is not in the black or white list."""
@@ -284,6 +299,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
     loadlogin()
     loadautochats()
+    fixautochatsdb(bot)
     #if os.path.isfile(encode_bot_addr+'.zip'):
        #unzipfile(encode_bot_addr+'.zip', '/')
 
