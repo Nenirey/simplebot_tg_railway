@@ -39,7 +39,7 @@ from dropbox.files import WriteMode
 from dropbox.exceptions import ApiError, AuthError
 import zipfile
 
-version = "0.1.5"
+version = "0.1.6"
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 login_hash = os.getenv('LOGIN_HASH')
