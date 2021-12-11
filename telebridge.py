@@ -239,15 +239,9 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
        return True
     return None
 
-@simplebot.hookimpl
-def deltabot_title_changed(chat, old, actor, message, replies, bot): 
-    """When the group title has been modified by an actor. 
-    :param chat: Chat where title was changed. 
-    :param old: The title that has been changed. 
-    :param actor: Contact that changed the title (None if it was our self-addr) 
-    :param message: The original system message that reports the change.
-    :param replies: Can be used to register replies without directly trying to send out.
-    :param bot: The bot that triggered the event. """
+@deltachat.hookimpl
+def ac_chat_modified(chat) -> None: 
+    """When chat has been modified"""
     if DBXTOKEN:
        zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
        backup('./'+zipfile)
