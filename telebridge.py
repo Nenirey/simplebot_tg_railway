@@ -242,7 +242,8 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
 @simplebot.hookimpl
 def deltabot_chat_modified(chat) -> None:
     if DBXTOKEN:
-       backup('./'+zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip'))
+       zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
+       backup('./'+zipfile)
 
 @simplebot.hookimpl
 def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
@@ -602,8 +603,6 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
-    if DBXTOKEN:
-       backup('./'+zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip'))
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
@@ -629,8 +628,6 @@ async def save_delta_chats(replies, message):
 
 def async_save_delta_chats(replies, message):
     loop.run_until_complete(save_delta_chats(replies, message))
-    if DBXTOKEN:
-       backup('./'+zipdir(bot_home+'./simplebot/',encode_bot_addr+'.zip'))
 
 async def load_delta_chats(contacto, replies = None):
     """This is for load the chats deltachat/telegram from Telegram saved message user"""
