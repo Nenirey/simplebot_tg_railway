@@ -240,6 +240,11 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
     return None
 
 @simplebot.hookimpl
+def deltabot_chat_modified(chat) -> None:
+    if DBXTOKEN:
+       backup('./'+zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip'))
+
+@simplebot.hookimpl
 def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
     if actor:
        print('Miembro '+str(contact.addr)+' agregado por '+str(actor.addr)+' chat: '+str(chat.get_name()))
