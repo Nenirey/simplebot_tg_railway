@@ -240,7 +240,7 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
     return None
 
 @simplebot.hookimpl
-def deltabot_title_changed(self, chat, old, actor, message, replies, bot): 
+def deltabot_title_changed(chat, old, actor, message, replies, bot): 
     """When the group title has been modified by an actor. 
     :param chat: Chat where title was changed. 
     :param old: The title that has been changed. 
