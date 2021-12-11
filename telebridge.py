@@ -155,8 +155,8 @@ def zipdir(dir_path,file_path):
         zf.write(dirname)
         print(dirname)
         for filename in files:
-            #if filename=='account.db-wal' or filename=='account.db-shm':
-            #   continue
+            if filename=='account.db-wal' or filename=='account.db-shm':
+               continue
             print(filename)
             zf.write(os.path.join(dirname, filename))
     zf.close()
@@ -212,6 +212,16 @@ def loadautochats():
        os.remove(AUTOCHATFILE)
     else:
        print("File "+AUTOCHATFILE+" not exists!!!")
+
+def backup_chats(chat_id):
+    cids = []
+    dchats = bot.account.get_chats()
+    for c in dchats:
+        cids.append(c.id)
+    if chat_id not in cids:
+       zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
+       backup('./'+zipfile)
+
 #end secure save storage
 
 def fixautochatsdb(bot):
@@ -222,7 +232,6 @@ def fixautochatsdb(bot):
     tmpdict = copy.deepcopy(autochatsdb)
     for (key, value) in tmpdict.items():
         for (inkey, invalue) in value.items():
-            #print('Autodescarga de '+str(key)+' chat '+str(inkey))
             if inkey not in cids:
                print('El chat '+str(inkey)+' no existe en el bot')
                del autochatsdb[key][inkey]
@@ -238,13 +247,6 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
        print('Usuario '+str(message.get_sender_contact().addr)+' esta en la lista negra')
        return True
     return None
-
-@simplebot.hookimpl
-def deltabot_chat_modified(chat) -> None: 
-    """When chat has been modified"""
-    if DBXTOKEN:
-       zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
-       backup('./'+zipfile)
 
 @simplebot.hookimpl
 def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
@@ -604,6 +606,8 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
+    if DBXTOKEN:
+       backup_chats(message.chat.id)
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
