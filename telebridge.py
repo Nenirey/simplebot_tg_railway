@@ -239,8 +239,8 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
        return True
     return None
 
-@deltachat.hookimpl
-def ac_chat_modified(chat) -> None: 
+@simplebot.hookimpl
+def deltabot_chat_modified(chat) -> None: 
     """When chat has been modified"""
     if DBXTOKEN:
        zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
