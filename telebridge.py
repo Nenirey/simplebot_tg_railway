@@ -155,7 +155,7 @@ def zipdir(dir_path,file_path):
         zf.write(dirname)
         print(dirname)
         for filename in files:
-            if filename=='account.db-wal' or filename=='account.db-shm':
+            if filename=='account.db-wal' or filename=='account.db-shm' or filename=='bot.log':
                continue
             print(filename)
             zf.write(os.path.join(dirname, filename))
@@ -200,6 +200,7 @@ def saveautochats():
     tf.close()
     if DBXTOKEN:
        backup(AUTOCHATFILE)
+       backup_chats()
 
 def loadautochats():
     if DBXTOKEN:
@@ -213,14 +214,10 @@ def loadautochats():
     else:
        print("File "+AUTOCHATFILE+" not exists!!!")
 
-def backup_chats(chat_id):
-    cids = []
-    dchats = bot.account.get_chats()
-    for c in dchats:
-        cids.append(c.id)
-    if chat_id not in cids:
-       zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
-       backup('./'+zipfile)
+def backup_chats():
+    zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
+    backup('./'+zipfile)
+    os.remove('./'+zipfile)
 
 #end secure save storage
 
@@ -606,8 +603,6 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
-    if DBXTOKEN:
-       backup_chats(message.chat.id)
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
