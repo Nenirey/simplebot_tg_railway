@@ -216,7 +216,8 @@ def loadautochats():
 
 def backup_chats():
     zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
-    backup('./'+zipfile)
+    if os.path.getsize('./'+zipfile)>22:
+       backup('./'+zipfile)
     os.remove('./'+zipfile)
 
 #end secure save storage
