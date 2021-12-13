@@ -177,6 +177,7 @@ def savelogin():
     tf.close()
     if DBXTOKEN:
        backup(LOGINFILE)
+    os.remove(LOGINFILE)  
 
 def loadlogin():
     if DBXTOKEN:
@@ -200,6 +201,7 @@ def saveautochats():
     tf.close()
     if DBXTOKEN:
        backup(AUTOCHATFILE)
+    os.remove(AUTOCHATFILE)  
 
 def loadautochats():
     if DBXTOKEN:
