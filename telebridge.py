@@ -200,7 +200,6 @@ def saveautochats():
     tf.close()
     if DBXTOKEN:
        backup(AUTOCHATFILE)
-       backup_chats()
 
 def loadautochats():
     if DBXTOKEN:
@@ -214,8 +213,10 @@ def loadautochats():
     else:
        print("File "+AUTOCHATFILE+" not exists!!!")
 
-def backup_chats():
+def backup_db(bot):
+    bot.account.stop_io()
     zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
+    bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
        backup('./'+zipfile)
     os.remove('./'+zipfile)
@@ -604,6 +605,8 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
+    if DBXTOKEN:
+       backup_db(bot)
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
