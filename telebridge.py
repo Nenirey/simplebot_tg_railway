@@ -155,8 +155,8 @@ def zipdir(dir_path,file_path):
         zf.write(dirname)
         print(dirname)
         for filename in files:
-            if filename=='account.db-wal' or filename=='account.db-shm' or filename=='bot.log':
-               continue
+            #if filename=='account.db-wal' or filename=='account.db-shm' or filename=='bot.log':
+            #   continue
             print(filename)
             zf.write(os.path.join(dirname, filename))
     zf.close()
@@ -214,9 +214,9 @@ def loadautochats():
        print("File "+AUTOCHATFILE+" not exists!!!")
 
 def backup_db(bot):
-    print('Backup...')
     bot.account.stop_io()
-    zipfile = zipdir(bot_home+'./simplebot/', encode_bot_addr+'.zip')
+    print('Backup...')
+    zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
     bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
        backup('./'+zipfile)
