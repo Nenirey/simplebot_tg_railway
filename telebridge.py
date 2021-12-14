@@ -1136,7 +1136,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               if m.poll:
                  if hasattr(m.poll.poll, 'question') and m.poll.poll.question:
                     poll_message+=m.poll.poll.question+'\n\n'
-                 if hasatter(m.poll.poll,'answers') and m.poll.poll.answers:
+                 if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
                     n_option = 0
                     for ans in m.poll.poll.answers:
                         poll_message+='\n'+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
