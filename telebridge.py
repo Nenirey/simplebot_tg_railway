@@ -1143,7 +1143,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                          ncolumn += 1
                      html_buttons += '\n'
                      nrow += 1
-              down_button = "\n⬇ /down_"+str(m.id)+"\n⏩ /forward_"+str(m.id)+"_DirectLinkGeneratorbot\n⏩ /forward_"+str(m.id)+"_aiouploaderbot"
+              down_button = "\n⬇ /down_"+str(m.id)+"\n⏩ /forward_"+str(m.id)+"_tg_file_link_bot\n⏩ /forward_"+str(m.id)+"_DirectLinkGeneratorbot\n⏩ /forward_"+str(m.id)+"_aiouploaderbot"
             
               #check if message is a poll
               if m.poll:
@@ -1153,7 +1153,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                     if m.poll.results.results and total_results>0:
                        n_results = 0
                        for res in m.poll.results.results:
-                           poll_message+='\n'+['✔ ' if ans.chosen]+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
+                           poll_message+='\n'+('✔ ' if ans.chosen)+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
                            n_results+=1
                     else:
                        if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
