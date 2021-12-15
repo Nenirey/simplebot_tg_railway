@@ -109,7 +109,7 @@ if DBXTOKEN:
        sys.exit("ERROR: Invalid access token; try re-generating an "
                 "access token from the app console on the web.")
 
-async def backup(backup_path):
+def backup(backup_path):
     with open(backup_path, 'rb') as f:
         print("Uploading " + backup_path + " to Dropbox...")
         if backup_path.startswith('.'):
@@ -176,7 +176,7 @@ def savelogin():
     json.dump(logindb, tf)
     tf.close()
     if DBXTOKEN:
-       loop.run_until_complete(backup(LOGINFILE))  
+       backup(LOGINFILE)
     os.remove(LOGINFILE)  
 
 def loadlogin():
@@ -200,7 +200,7 @@ def saveautochats():
     json.dump(autochatsdb, tf)
     tf.close()
     if DBXTOKEN:
-       loop.run_until_complete(backup(LOGINFILE))
+       backup(AUTOCHATFILE)
     os.remove(AUTOCHATFILE)  
 
 def loadautochats():
@@ -221,7 +221,7 @@ def backup_db(bot):
     zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
     bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
-       loop.run_until_complete(backup('./'+zipfile))
+       backup('./'+zipfile)
     else:
        print('Invalid zip file!')
     os.remove('./'+zipfile)
@@ -1166,7 +1166,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                        if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
                           n_option = 0
                           for ans in m.poll.poll.answers:
-                              poll_message+='\n '+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
+                              poll_message+='\n🔳 '+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
                               n_option+=1
                     poll_message+='\n\n'+str(total_results)+' votos'          
 
