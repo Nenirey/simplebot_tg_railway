@@ -109,7 +109,7 @@ if DBXTOKEN:
        sys.exit("ERROR: Invalid access token; try re-generating an "
                 "access token from the app console on the web.")
 
-def backup(backup_path):
+async def backup(backup_path):
     with open(backup_path, 'rb') as f:
         print("Uploading " + backup_path + " to Dropbox...")
         if backup_path.startswith('.'):
@@ -176,7 +176,7 @@ def savelogin():
     json.dump(logindb, tf)
     tf.close()
     if DBXTOKEN:
-       backup(LOGINFILE)
+       loop.run_until_complete(backup(LOGINFILE))  
     os.remove(LOGINFILE)  
 
 def loadlogin():
@@ -200,7 +200,7 @@ def saveautochats():
     json.dump(autochatsdb, tf)
     tf.close()
     if DBXTOKEN:
-       backup(AUTOCHATFILE)
+       loop.run_until_complete(backup(LOGINFILE))
     os.remove(AUTOCHATFILE)  
 
 def loadautochats():
@@ -221,7 +221,7 @@ def backup_db(bot):
     zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
     bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
-       backup('./'+zipfile)
+       loop.run_until_complete(backup('./'+zipfile))
     else:
        print('Invalid zip file!')
     os.remove('./'+zipfile)
@@ -1159,14 +1159,14 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                               else:   
                                  mark_text = "☑ "
                            else:
-                              mark_text = "⬛ "
+                              mark_text = "🔳 "
                            poll_message+='\n'+mark_text+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
                            n_results+=1
                     else:
                        if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
                           n_option = 0
                           for ans in m.poll.poll.answers:
-                              poll_message+='\n⬛ '+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
+                              poll_message+='\n '+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
                               n_option+=1
                     poll_message+='\n\n'+str(total_results)+' votos'          
 
