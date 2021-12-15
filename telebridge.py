@@ -955,7 +955,7 @@ async def click_button(message, replies, payload):
        n_column = int(parametros[1])
        if len(paramtros)<3:
           n_row = 0
-       els:
+       else:
           n_row = int(parametros[2])
        for m in all_messages:
            await m.click(n_column, n_row)
