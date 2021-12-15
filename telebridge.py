@@ -1066,7 +1066,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                   
               #check if message is a forward
               if m.fwd_from:
-                 fwd_text = 'Mensaje reenviado\nDe:' 
+                 fwd_text = 'Mensaje reenviado\n' 
 
               #check if message is a reply
               if hasattr(m,'reply_to') and m.reply_to:
@@ -1148,12 +1148,12 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               #check if message is a poll
               if m.poll:
                  if hasattr(m.poll.poll, 'question') and m.poll.poll.question:
-                    poll_message+='\n📊'+m.poll.poll.question+'\n\n'
+                    poll_message+='\n📊 '+m.poll.poll.question+'\n\n'
                     total_results = m.poll.results.total_voters
                     if m.poll.results.results and total_results>0:
                        n_results = 0
                        for res in m.poll.results.results:
-                           poll_message+='\n'+("✔ " if res.chosen else "")+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
+                           poll_message+='\n'+("☑ " if res.chosen else "")+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
                            n_results+=1
                     else:
                        if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
