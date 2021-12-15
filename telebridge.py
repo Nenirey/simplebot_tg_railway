@@ -930,6 +930,9 @@ async def click_button(message, replies, payload):
     if message.get_sender_contact().addr not in logindb:
        replies.add(text = 'Debe iniciar sesión usar los botones!')
        return
+    if len(parametros)<2:
+       replies.add(text = 'Faltan parametros, debe proporcionar el id de mensaje y al menos el numero de columna')  
+       return  
     dchat = message.chat.get_name()
 
     tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
@@ -949,8 +952,13 @@ async def click_button(message, replies, payload):
           target = id_chat
        tchat = await client(functions.messages.GetPeerDialogsRequest(peers=[target] ))
        all_messages = await client.get_messages(target, ids = [int(parametros[0])])
+       n_column = int(parametros[1])
+       if len(paramtros)<3:
+          n_row = 0
+       els:
+          n_row = int(parametros[2])
        for m in all_messages:
-           await m.click(int(parametros[1]),int(parametros[2]))
+           await m.click(n_column, n_row)
        await client.disconnect()
     except:
        code = str(sys.exc_info())
@@ -1140,18 +1148,20 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               #check if message is a poll
               if m.poll:
                  if hasattr(m.poll.poll, 'question') and m.poll.poll.question:
-                    poll_message+='\n'+m.poll.poll.question+'\n\n'
-                 if m.poll.results.results:
-                    n_results = 0
-                    for res in m.poll.results.results:
-                        poll_message+='\n'+str(res.voters)+' '+m.poll.poll.answers[n_results].text
-                        n_results+=1
-                 else:
-                    if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
-                       n_option = 0
-                       for ans in m.poll.poll.answers:
-                           poll_message+='\n'+ans.text+' /c_'+str(m.id)+'_'+str(n_option)+'_0'
-                           n_option+=1
+                    poll_message+='\n📊'+m.poll.poll.question+'\n\n'
+                    total_results = m.poll.results.total_voters
+                    if m.poll.results.results and total_results>0:
+                       n_results = 0
+                       for res in m.poll.results.results:
+                           poll_message+='\n'+['✔ ' if ans.chosen]+str(round((res.voters/total_results)*100))+'% ('+str(res.voters)+') '+m.poll.poll.answers[n_results].text
+                           n_results+=1
+                    else:
+                       if hasattr(m.poll.poll,'answers') and m.poll.poll.answers:
+                          n_option = 0
+                          for ans in m.poll.poll.answers:
+                              poll_message+='\n'+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
+                              n_option+=1
+                    poll_message+='\n\n'+str(total_results)+' votos'          
 
               #check if message have document
               if hasattr(m,'document') and m.document:
