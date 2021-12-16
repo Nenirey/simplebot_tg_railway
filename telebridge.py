@@ -1,7 +1,7 @@
 import simplebot
 import deltachat
 from simplebot.bot import DeltaBot, Replies
-from deltachat import Chat, Contact, Message
+from deltachat import Chat, Contact, Message, account_hookimpl
 from typing import Optional
 import sys
 import os
