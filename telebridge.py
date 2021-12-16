@@ -240,6 +240,19 @@ def fixautochatsdb(bot):
                print('El chat '+str(inkey)+' no existe en el bot')
                del autochatsdb[key][inkey]
 
+class AccountPlugin:
+      def __init__(self, bot:DeltaBot) -> None:
+          self.bot = bot
+
+      @account_hookimpl
+      def ac_chat_modified(self, chat):
+          print('Chat modificado/creado')
+
+      @account_hookimpl
+      def ac_process_ffi_event(self, ffi_event):
+          if ffi_event.name == "DC_EVENT_WARNING":
+             print('Warning en un evento')
+
 
 @simplebot.hookimpl(tryfirst=True)
 def deltabot_incoming_message(message, replies) -> Optional[bool]:
@@ -265,6 +278,7 @@ def deltabot_init(bot: DeltaBot) -> None:
     bot.account.set_avatar("telegram.jpeg")
     bot.account.set_config("mdns_enabled","0")
     bot.account.set_config("delete_device_after","21600")
+    bot.account.add_account_plugin(AccountPlugin(bot))
     bot.commands.register(name = "/eval" ,func = eval_func, admin = True)
     bot.commands.register(name = "/start" ,func = start_updater, admin = True)
     bot.commands.register(name = "/stop" ,func = stop_updater, admin = True)
