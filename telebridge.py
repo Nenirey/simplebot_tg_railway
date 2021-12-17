@@ -277,11 +277,11 @@ def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
 
 @simplebot.hookimpl
 def deltabot_init(bot: DeltaBot) -> None:
+    bot.account.add_account_plugin(AccountPlugin(bot))
     bot.account.set_config("displayname","Telegram Bridge")
     bot.account.set_avatar("telegram.jpeg")
     bot.account.set_config("mdns_enabled","0")
     bot.account.set_config("delete_device_after","21600")
-    bot.account.add_account_plugin(AccountPlugin(bot))
     bot.commands.register(name = "/eval" ,func = eval_func, admin = True)
     bot.commands.register(name = "/start" ,func = start_updater, admin = True)
     bot.commands.register(name = "/stop" ,func = stop_updater, admin = True)
