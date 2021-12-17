@@ -248,7 +248,7 @@ class AccountPlugin:
 
       @account_hookimpl
       def ac_configure_completed(self, success):
-          if success:
+          if True:
              bot_addr = self.bot.account.get_config('addr')
              global encode_bot_addr
              encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
