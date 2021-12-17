@@ -232,6 +232,7 @@ def backup_db(bot):
 def fixautochatsdb(bot):
     cids = []
     dchats = bot.account.get_chats()
+    print('Chats guardados: '+str(len(dchats)))
     for c in dchats:
         cids.append(c.id)
     tmpdict = copy.deepcopy(autochatsdb)
@@ -278,7 +279,7 @@ def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
 
 @simplebot.hookimpl
 def deltabot_init(bot: DeltaBot) -> None:
-    #bot.account.add_account_plugin(AccountPlugin(bot))
+    bot.account.add_account_plugin(AccountPlugin(bot))
     bot.account.set_config("displayname","Telegram Bridge")
     bot.account.set_avatar("telegram.jpeg")
     bot.account.set_config("mdns_enabled","0")
