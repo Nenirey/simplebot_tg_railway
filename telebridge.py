@@ -2,7 +2,7 @@ import simplebot
 import deltachat
 from simplebot.bot import DeltaBot, Replies
 from deltachat import Chat, Contact, Message
-#from deltachat import account_hookimpl
+from deltachat import account_hookimpl
 from typing import Optional
 import sys
 import os
@@ -218,10 +218,10 @@ def loadautochats():
        print("File "+AUTOCHATFILE+" not exists!!!")
 
 def backup_db(bot):
-    bot.account.stop_io()
+    #bot.account.stop_io()
     print('Backup...')
     zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
-    bot.account.start_io()
+    #bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
        backup('./'+zipfile)
     else:
@@ -243,7 +243,7 @@ def fixautochatsdb(bot):
                print('El chat '+str(inkey)+' no existe en el bot')
                del autochatsdb[key][inkey]
 
-"""
+
 class AccountPlugin:
       def __init__(self, bot:DeltaBot) -> None:
           self.bot = bot
@@ -259,7 +259,7 @@ class AccountPlugin:
           if ffi_event.name == "DC_EVENT_WARNING":
              if ffi_event.data2 and ffi_event.data2.find("Daily send limit")>=0:
                 print('Limite diario de mensajes alcanzado!')
-"""
+
 
 
 @simplebot.hookimpl(tryfirst=True)
@@ -282,7 +282,7 @@ def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
 
 @simplebot.hookimpl
 def deltabot_init(bot: DeltaBot) -> None:
-    #bot.account.add_account_plugin(AccountPlugin(bot))
+    bot.account.add_account_plugin(AccountPlugin(bot))
     bot.account.set_config("displayname","Telegram Bridge")
     bot.account.set_avatar("telegram.jpeg")
     bot.account.set_config("mdns_enabled","0")
@@ -630,8 +630,8 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
-    if DBXTOKEN:
-       backup_db(bot)   
+    #if DBXTOKEN:
+    #   backup_db(bot)   
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
