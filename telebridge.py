@@ -245,17 +245,17 @@ def fixautochatsdb(bot):
 
 
 class AccountPlugin:
-      def __init__(self, bot:DeltaBot) -> None:
-          self.bot = bot
+      #def __init__(self, bot:DeltaBot) -> None:
+      #    self.bot = bot
              
       @account_hookimpl
-      def ac_chat_modified(chat):
+      def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
           if DBXTOKEN:
              backup_db()  
 
       @account_hookimpl
-      def ac_process_ffi_event(ffi_event):
+      def ac_process_ffi_event(self, ffi_event):
           if ffi_event.name == "DC_EVENT_WARNING":
              if ffi_event.data2 and ffi_event.data2.find("Daily send limit")>=0:
                 print('Limite diario de mensajes alcanzado!')
@@ -282,7 +282,7 @@ def deltabot_member_added(chat, contact, actor, message, replies, bot) -> None:
 
 @simplebot.hookimpl
 def deltabot_init(bot: DeltaBot) -> None:
-    bot.account.add_account_plugin(AccountPlugin(bot))
+    bot.account.add_account_plugin(AccountPlugin())
     bot.account.set_config("displayname","Telegram Bridge")
     bot.account.set_avatar("telegram.jpeg")
     bot.account.set_config("mdns_enabled","0")
