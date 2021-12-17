@@ -617,7 +617,6 @@ async def add_auto_chats(bot, replies, message):
              else:
                 autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
                 replies.add(text='Se ha automatizado este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer!')
-          saveautochats()
        else:
           replies.add(text='Solo se permite automatizar chats privados, canales y algunos grupos permitidos por ahora')
     else:
@@ -627,6 +626,7 @@ async def add_auto_chats(bot, replies, message):
 def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
+    saveautochats()
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
