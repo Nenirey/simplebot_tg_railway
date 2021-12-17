@@ -245,23 +245,7 @@ def fixautochatsdb(bot):
 class AccountPlugin:
       def __init__(self, bot:DeltaBot) -> None:
           self.bot = bot
-
-      @account_hookimpl
-      def ac_configure_completed(self, success):
-          if True:
-             bot_addr = self.bot.account.get_config('addr')
-             global encode_bot_addr
-             encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
-             if admin_addr:
-                bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
-             global LOGINFILE
-             LOGINFILE = './'+encode_bot_addr+'/logindb.json'
-             global AUTOCHATFILE
-             AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
-             loadlogin()
-             loadautochats()
-             fixautochatsdb(self.bot)
-
+             
       @account_hookimpl
       def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
@@ -335,6 +319,18 @@ def deltabot_start(bot: DeltaBot) -> None:
     bridge_init.wait()
     global auto_load_task
     auto_load_task = asyncio.run_coroutine_threadsafe(auto_load(bot=bot, message = Message, replies = Replies),tloop)
+    bot_addr = self.bot.account.get_config('addr')
+    global encode_bot_addr
+    encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
+    global LOGINFILE
+    LOGINFILE = './'+encode_bot_addr+'/logindb.json'
+    global AUTOCHATFILE
+    AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
+    loadlogin()
+    loadautochats()
+    fixautochatsdb(self.bot)
+    if admin_addr:
+       bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
     
 
 def register_msg(contacto, dc_id, dc_msg, tg_msg):
