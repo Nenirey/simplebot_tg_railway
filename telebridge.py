@@ -217,7 +217,7 @@ def loadautochats():
     else:
        print("File "+AUTOCHATFILE+" not exists!!!")
 
-def backup_db(bot):
+def backup_db():
     #bot.account.stop_io()
     print('Backup...')
     zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
@@ -245,17 +245,17 @@ def fixautochatsdb(bot):
 
 
 class AccountPlugin:
-      def __init__(self, bot:DeltaBot) -> None:
-          self.bot = bot
+      #def __init__(self, bot:DeltaBot) -> None:
+          #self.bot = bot
              
       @account_hookimpl
-      def ac_chat_modified(self, chat):
+      def ac_chat_modified(chat):
           print('Chat modificado/creado: '+chat.get_name())
           if DBXTOKEN:
-             backup_db(self.bot)  
+             backup_db()  
 
       @account_hookimpl
-      def ac_process_ffi_event(self, ffi_event):
+      def ac_process_ffi_event(ffi_event):
           if ffi_event.name == "DC_EVENT_WARNING":
              if ffi_event.data2 and ffi_event.data2.find("Daily send limit")>=0:
                 print('Limite diario de mensajes alcanzado!')
