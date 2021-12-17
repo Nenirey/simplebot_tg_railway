@@ -247,11 +247,13 @@ class AccountPlugin:
       @account_hookimpl
       def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
+          if DBXTOKEN:
+             backup_db(bot)
 
       @account_hookimpl
       def ac_process_ffi_event(self, ffi_event):
           if ffi_event.name == "DC_EVENT_WARNING":
-             print('Warning en un evento: '+str(ffi_event))
+             print('Warning en un evento: '+str(dir(ffi_event)))
 
 
 @simplebot.hookimpl(tryfirst=True)
@@ -624,8 +626,6 @@ def async_add_auto_chats(bot, replies, message):
     """Enable auto load messages in the current chat. Example: /auto"""
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
-    if DBXTOKEN:
-       backup_db(bot)
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
