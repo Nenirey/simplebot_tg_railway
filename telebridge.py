@@ -245,8 +245,8 @@ def fixautochatsdb(bot):
 
 
 class AccountPlugin:
-      #def __init__(self, bot:DeltaBot) -> None:
-          #self.bot = bot
+      def __init__(self, bot:DeltaBot) -> None:
+          self.bot = bot
              
       @account_hookimpl
       def ac_chat_modified(chat):
