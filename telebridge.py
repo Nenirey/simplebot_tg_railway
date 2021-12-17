@@ -319,7 +319,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     bridge_init.wait()
     global auto_load_task
     auto_load_task = asyncio.run_coroutine_threadsafe(auto_load(bot=bot, message = Message, replies = Replies),tloop)
-    bot_addr = self.bot.account.get_config('addr')
+    bot_addr = bot.account.get_config('addr')
     global encode_bot_addr
     encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
     global LOGINFILE
@@ -328,7 +328,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
     loadlogin()
     loadautochats()
-    fixautochatsdb(self.bot)
+    fixautochatsdb(bot)
     if admin_addr:
        bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
     
