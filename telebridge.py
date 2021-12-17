@@ -217,10 +217,10 @@ def loadautochats():
        print("File "+AUTOCHATFILE+" not exists!!!")
 
 def backup_db(bot):
-    #bot.account.stop_io()
+    bot.account.stop_io()
     print('Backup...')
     zipfile = zipdir(bot_home+'/.simplebot/', encode_bot_addr+'.zip')
-    #bot.account.start_io()
+    bot.account.start_io()
     if os.path.getsize('./'+zipfile)>22:
        backup('./'+zipfile)
     else:
