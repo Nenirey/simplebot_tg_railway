@@ -248,7 +248,7 @@ class AccountPlugin:
       def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
           if DBXTOKEN:
-             backup_db(bot)
+             backup_db(self.bot)
 
       @account_hookimpl
       def ac_process_ffi_event(self, ffi_event):
