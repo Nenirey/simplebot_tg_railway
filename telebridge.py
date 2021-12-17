@@ -1856,6 +1856,7 @@ def stats(replies) -> None:
         f"Path: {sizeof_fmt(size)}\n"
         f"SimpleBot: {simplebot.__version__}\n"
         f"DeltaChat: {deltachat.__version__}\n"
+        f"simplebot_tg: {version}\n"
     )
 
 def sizeof_fmt(num: float) -> str:
