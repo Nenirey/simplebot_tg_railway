@@ -233,9 +233,9 @@ def backup_db(bot):
 def fixautochatsdb(bot):
     cids = []
     dchats = bot.account.get_chats()
-    print('Chats guardados: '+str(len(dchats)))
     for c in dchats:
         cids.append(c.id)
+    print('Chats guardados: '+str(len(cids)))     
     tmpdict = copy.deepcopy(autochatsdb)
     for (key, value) in tmpdict.items():
         for (inkey, invalue) in value.items():
