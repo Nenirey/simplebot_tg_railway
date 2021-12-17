@@ -2,7 +2,7 @@ import simplebot
 import deltachat
 from simplebot.bot import DeltaBot, Replies
 from deltachat import Chat, Contact, Message
-#from deltachat import account_hookimpl
+from deltachat import account_hookimpl
 from typing import Optional
 import sys
 import os
@@ -41,7 +41,7 @@ from dropbox.files import WriteMode
 from dropbox.exceptions import ApiError, AuthError
 import zipfile
 
-version = "0.1.6"
+version = "0.1.7"
 api_id = os.getenv('API_ID')
 api_hash = os.getenv('API_HASH')
 login_hash = os.getenv('LOGIN_HASH')
@@ -241,10 +241,26 @@ def fixautochatsdb(bot):
                print('El chat '+str(inkey)+' no existe en el bot')
                del autochatsdb[key][inkey]
 
-"""
+
 class AccountPlugin:
       def __init__(self, bot:DeltaBot) -> None:
           self.bot = bot
+
+      @account_hookimpl
+      def ac_configure_completed(self, success):
+          if success:
+             bot_addr = self.bot.account.get_config('addr')
+             global encode_bot_addr
+             encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
+             if admin_addr:
+                bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
+             global LOGINFILE
+             LOGINFILE = './'+encode_bot_addr+'/logindb.json'
+             global AUTOCHATFILE
+             AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
+             loadlogin()
+             loadautochats()
+             fixautochatsdb(self.bot)
 
       @account_hookimpl
       def ac_chat_modified(self, chat):
@@ -255,7 +271,7 @@ class AccountPlugin:
           if ffi_event.name == "DC_EVENT_WARNING":
              if ffi_event.data2 and ffi_event.data2.find("Daily send limit")>=0:
                 print('Limite diario de mensajes alcanzado!')
-"""
+
 
 
 @simplebot.hookimpl(tryfirst=True)
@@ -319,21 +335,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     bridge_init.wait()
     global auto_load_task
     auto_load_task = asyncio.run_coroutine_threadsafe(auto_load(bot=bot, message = Message, replies = Replies),tloop)
-    bot_addr = bot.account.get_config('addr')
-    global encode_bot_addr
-    encode_bot_addr = urllib.parse.quote(bot_addr, safe='')
-    if admin_addr:
-       bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
-    global LOGINFILE
-    LOGINFILE = './'+encode_bot_addr+'/logindb.json'
-    global AUTOCHATFILE
-    AUTOCHATFILE = './'+encode_bot_addr+'/autochatsdb.json'
-    loadlogin()
-    loadautochats()
-    fixautochatsdb(bot)
-    #if os.path.isfile(encode_bot_addr+'.zip'):
-       #unzipfile(encode_bot_addr+'.zip', '/')
-
+    
 
 def register_msg(contacto, dc_id, dc_msg, tg_msg):
    global messagedb
