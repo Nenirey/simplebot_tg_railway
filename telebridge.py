@@ -992,7 +992,7 @@ def async_click_button(bot, message, replies, payload):
 
 async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies, payload = None, dc_contact = None, dc_id = None, is_auto = False):
     contacto = dc_contact
-    chat_id = bot.get_chat(dc_id)
+    chat_id = bot.get_chat(int(dc_id))
     dchat = chat_id.get_name()
     if is_auto:
        max_limit = 1
