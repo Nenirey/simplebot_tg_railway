@@ -246,12 +246,12 @@ class AccountPlugin:
 
       @account_hookimpl
       def ac_chat_modified(self, chat):
-          print('Chat modificado/creado')
+          print('Chat modificado/creado: '+chat.get_name())
 
       @account_hookimpl
       def ac_process_ffi_event(self, ffi_event):
           if ffi_event.name == "DC_EVENT_WARNING":
-             print('Warning en un evento')
+             print('Warning en un evento: '+str(ffi_event))
 
 
 @simplebot.hookimpl(tryfirst=True)
