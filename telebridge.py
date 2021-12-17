@@ -112,7 +112,7 @@ if DBXTOKEN:
 
 def backup(backup_path):
     with open(backup_path, 'rb') as f:
-        print("Uploading " + backup_path + " to Dropbox...")
+        bot.logger.debug("Uploading " + backup_path + " to Dropbox...")
         if backup_path.startswith('.'):
            dbx_backup_path = backup_path.replace('.','',1)
         else:
@@ -124,16 +124,17 @@ def backup(backup_path):
             # enough Dropbox space quota to upload this file
             if (err.error.is_path() and
                     err.error.get_path().reason.is_insufficient_space()):
-                sys.exit("ERROR: Cannot back up; insufficient space.")
+                #sys.exit("ERROR: Cannot back up; insufficient space.")
+                bot.logger.exception("ERROR: Cannot back up; insufficient space.", err)  
             elif err.user_message_text:
-                print(err.user_message_text)
+                bot.logger.exception(err.user_message_text)
                 sys.exit()
             else:
-                print(err)
+                bot.logger.exception(err)
                 sys.exit()
 
 def restore(backup_path):
-    print("Downloading current " + backup_path + " from Dropbox, overwriting...")
+    bot.logger.debug("Downloading current " + backup_path + " from Dropbox, overwriting...")  
     if not os.path.exists(os.path.dirname(backup_path)):
         os.makedirs(os.path.dirname(backup_path))
     try:
@@ -146,7 +147,7 @@ def restore(backup_path):
        f.write(res.content)
        f.close()
     except:
-       print('Error in restore '+backup_path)
+       bot.logger.exception("Error in restore ", backup_path)  
 
 def zipdir(dir_path,file_path):
     zf = zipfile.ZipFile(file_path, "w")
@@ -154,11 +155,11 @@ def zipdir(dir_path,file_path):
         if dirname.endswith('account.db-blobs'):
            continue
         zf.write(dirname)
-        print(dirname)
+        bot.logger.debug(dirname)
         for filename in files:
             #if filename=='account.db-wal' or filename=='account.db-shm' or filename=='bot.log':
             #   continue
-            print(filename)
+            bot.logger.debug(filename)
             zf.write(os.path.join(dirname, filename))
     zf.close()
     return file_path
