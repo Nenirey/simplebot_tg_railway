@@ -1448,7 +1448,7 @@ async def send_cmd(message, replies, payload):
           else:
              await client.send_file(target, message.filename, caption = payload, reply_to=t_reply)
        else:
-          await client.send_message(target,payload)
+          await client.send_message(target,payload, reply_to=t_reply)
        await client.disconnect()
     except:
        await client(SendMessageRequest(target, payload))
