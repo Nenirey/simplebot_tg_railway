@@ -125,7 +125,7 @@ def backup(backup_path):
             if (err.error.is_path() and
                     err.error.get_path().reason.is_insufficient_space()):
                 #sys.exit("ERROR: Cannot back up; insufficient space.")
-                print("ERROR: Cannot back up; insufficient space.", err)  
+                print("ERROR: Cannot back up; insufficient space.", err)
             elif err.user_message_text:
                 print(err.user_message_text)
                 sys.exit()
@@ -134,7 +134,7 @@ def backup(backup_path):
                 sys.exit()
 
 def restore(backup_path):
-    print("Downloading current " + backup_path + " from Dropbox, overwriting...")  
+    print("Downloading current " + backup_path + " from Dropbox, overwriting...")
     if not os.path.exists(os.path.dirname(backup_path)):
         os.makedirs(os.path.dirname(backup_path))
     try:
@@ -147,7 +147,7 @@ def restore(backup_path):
        f.write(res.content)
        f.close()
     except:
-       print("Error in restore " + backup_path)  
+       print("Error in restore " + backup_path)
 
 def zipdir(dir_path,file_path):
     zf = zipfile.ZipFile(file_path, "w")
@@ -179,7 +179,7 @@ def savelogin():
     tf.close()
     if DBXTOKEN:
        backup(LOGINFILE)
-    os.remove(LOGINFILE)  
+    os.remove(LOGINFILE)
 
 def loadlogin():
     if DBXTOKEN:
@@ -203,7 +203,7 @@ def saveautochats():
     tf.close()
     if DBXTOKEN:
        backup(AUTOCHATFILE)
-    os.remove(AUTOCHATFILE)  
+    os.remove(AUTOCHATFILE)
 
 def loadautochats():
     if DBXTOKEN:
@@ -235,7 +235,7 @@ def fixautochatsdb(bot):
     dchats = bot.account.get_chats()
     for c in dchats:
         cids.append(str(c.id))
-    print('Chats guardados: '+str(cids))     
+    #print('Chats guardados: '+str(cids))
     tmpdict = copy.deepcopy(autochatsdb)
     for (key, value) in tmpdict.items():
         for (inkey, invalue) in value.items():
@@ -247,17 +247,17 @@ def fixautochatsdb(bot):
 class AccountPlugin:
       #def __init__(self, bot:DeltaBot) -> None:
       #    self.bot = bot
-             
+
       @account_hookimpl
       def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
           if DBXTOKEN:
-             backup_db()  
+             backup_db()
 
       @account_hookimpl
       def ac_process_ffi_event(self, ffi_event):
           if ffi_event.name == "DC_EVENT_WARNING":
-             print('Evento warning detectado!')  
+             print('Evento warning detectado!', ffi_event)
              #if ffi_event.data2 and ffi_event.data2.find("Daily send limit")>=0:
                 #print('Limite diario de mensajes alcanzado!')
 
@@ -336,7 +336,7 @@ def deltabot_start(bot: DeltaBot) -> None:
     fixautochatsdb(bot)
     if admin_addr:
        bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
-    
+
 
 def register_msg(contacto, dc_id, dc_msg, tg_msg):
    global messagedb
@@ -632,7 +632,7 @@ def async_add_auto_chats(bot, replies, message):
     loop.run_until_complete(add_auto_chats(bot, replies, message))
     saveautochats()
     #if DBXTOKEN:
-    #   backup_db(bot)   
+    #   backup_db(bot)
 
 async def save_delta_chats(replies, message):
     """This is for save the chats deltachat/telegram in Telegram Saved message user"""
@@ -676,6 +676,7 @@ async def load_delta_chats(contacto, replies = None):
           tf = open(contacto+'.json','r')
           chatdb[contacto]=json.load(tf)
           tf.close()
+          os.remove(contacto+'.json')
        await client.disconnect()
     except:
        print('Error loading delta chats')
@@ -952,8 +953,8 @@ async def click_button(message, replies, payload):
        replies.add(text = 'Debe iniciar sesión usar los botones!')
        return
     if len(parametros)<2:
-       replies.add(text = 'Faltan parametros, debe proporcionar el id de mensaje y al menos el numero de columna')  
-       return  
+       replies.add(text = 'Faltan parametros, debe proporcionar el id de mensaje y al menos el numero de columna')
+       return
     dchat = message.chat.get_name()
 
     tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
@@ -1075,7 +1076,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               tipo = None
               text_message = ''
               poll_message = ''
-              fwd_text = '' 
+              fwd_text = ''
               if show_id:
                  msg_id = '\n'+str(m.id)
 
@@ -1084,10 +1085,10 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                  text_message = str(m.text)
               else:
                  text_message = ''
-                  
+
               #check if message is a forward
               if m.fwd_from:
-                 fwd_text = 'Mensaje reenviado\n' 
+                 fwd_text = 'Mensaje reenviado\n'
 
               #check if message is a reply
               if hasattr(m,'reply_to') and m.reply_to:
@@ -1165,7 +1166,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                      html_buttons += '\n'
                      nrow += 1
               down_button = "\n⬇ /down_"+str(m.id)+"\n⏩ /forward_"+str(m.id)+"_tg_file_link_bot\n⏩ /forward_"+str(m.id)+"_DirectLinkGeneratorbot\n⏩ /forward_"+str(m.id)+"_aiouploaderbot"
-            
+
               #check if message is a poll
               if m.poll:
                  if hasattr(m.poll.poll, 'question') and m.poll.poll.question:
@@ -1177,7 +1178,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                            if res.chosen:
                               if res.correct:
                                  mark_text = "✅ "
-                              else:   
+                              else:
                                  mark_text = "☑ "
                            else:
                               mark_text = "🔳 "
@@ -1189,7 +1190,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                           for ans in m.poll.poll.answers:
                               poll_message+='\n\n🔳 '+ans.text+' /c_'+str(m.id)+'_'+str(n_option)
                               n_option+=1
-                    poll_message+='\n\n'+str(total_results)+' votos'          
+                    poll_message+='\n\n'+str(total_results)+' votos'
 
               #check if message have document
               if hasattr(m,'document') and m.document:
@@ -1268,7 +1269,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                                 #print('Archivo web muy grande!')
                                 down_button = '\n[ARCHIVO WEB] '+sizeof_fmt(f_size)+down_button
                                 file_attach = ''
-                  
+
                        if hasattr(m.media.webpage,'title') and m.media.webpage.title:
                           wtitle = m.media.webpage.title
                        else:
