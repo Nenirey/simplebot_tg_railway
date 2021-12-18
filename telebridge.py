@@ -337,6 +337,12 @@ def deltabot_start(bot: DeltaBot) -> None:
     if admin_addr:
        bot.get_chat(admin_addr).send_text('El bot '+bot_addr+' se ha iniciado correctamente')
 
+def broadcast_message(bot, msg):
+    for (user,_) in logindb.items():
+        try:
+           bot.get_chat(user).send_text(msg)
+        except:
+           print('Error sending broadcast to '+user)
 
 def register_msg(contacto, dc_id, dc_msg, tg_msg):
    global messagedb
