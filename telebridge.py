@@ -1315,13 +1315,13 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               await m.mark_read()
            else:
               if not load_history and not is_auto:
-                 myreplies.add(text = "Tienes "+str(sin_leer-limite)+" mensajes sin leer de "+str(ttitle)+"\n/more", chat = chat_id)
+                 myreplies.add(text = "Tienes "+str(sin_leer-limite)+" mensajes sin leer de "+str(ttitle)+"\n➕ /more", chat = chat_id)
               break
        if sin_leer-limite<=0 and not load_history and not is_auto:
-          myreplies.add(text = "Estas al día con "+str(ttitle)+"\n/more", chat = chat_id)
+          myreplies.add(text = "Estas al día con "+str(ttitle)+"\n➕ /more", chat = chat_id)
 
        if load_history:
-          myreplies.add(text = "Cargar más mensajes:\n/more_-"+str(m_id), chat = chat_id)
+          myreplies.add(text = "Cargar más mensajes:\n➕ /more_-"+str(m_id), chat = chat_id)
        myreplies.send_reply_messages()
        await client.disconnect()
     except:
