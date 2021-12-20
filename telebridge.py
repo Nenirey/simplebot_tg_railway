@@ -488,7 +488,7 @@ async def pin_messages(message, replies):
        t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)
        if t_reply:
           await client.pin_message(f_id, t_reply)
-          replies.add(text = 'Mensaje fijado')
+          replies.add(text = 'Mensaje fijado!')
        else:
           replies.add(text = 'No se puede fijar el mensaje porque no esta asociado a un mensaje de Telegram!')
        await client.disconnect()
