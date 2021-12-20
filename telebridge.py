@@ -565,7 +565,7 @@ def list_chats(replies, message, payload):
        chatdb[message.get_sender_contact().addr] = {}
     chat_list = ''
     for (key, value) in chatdb[message.get_sender_contact().addr].items():
-        chat_list+='\n\n'+value+'\nDesvincular: /remove_'+key
+        chat_list+='\n\n'+value+'\n❌ Desvincular: /remove_'+key
     replies.add(text = chat_list)
 
 async def add_auto_chats(bot, replies, message):
