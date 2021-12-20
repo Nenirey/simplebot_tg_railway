@@ -50,8 +50,8 @@ bot_home = expanduser("~")
 white_list = None
 black_list = None
 
-MAX_AUTO_CHATS = 1
-MAX_SIZE_DOWN = 10485760
+MAX_AUTO_CHATS = 2
+MAX_SIZE_DOWN = 20485760
 MIN_SIZE_DOWN = 655360
 
 #use env to add to the lists like "user1@domine.com user2@domine.com" with out ""
