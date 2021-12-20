@@ -685,7 +685,9 @@ async def load_delta_chats(contacto, replies = None):
           os.remove(contacto+'.json')
        await client.disconnect()
     except:
-       print('Error loading delta chats of '+contacto)
+       code = str(sys.exc_info())
+       print('Error loading delta chats of '+contacto+'\n'+code)
+
 
 def async_load_delta_chats(message, replies):
     loop.run_until_complete(load_delta_chats(contacto=message.get_sender_contact().addr, replies=replies))
