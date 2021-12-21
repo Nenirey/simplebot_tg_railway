@@ -514,15 +514,15 @@ async def chat_info(bot, payload, replies, message):
                if hasattr(full_pchat,'user') and full_pchat.user:
                   ttitle = full_pchat.user.first_name
           elif isinstance(pchat, types.InputPeerChat):
-               print('Hemos encontrado un InputPeerChat: '+str(uid))
+               print('Hemos encontrado un InputPeerChat: '+str(f_id))
                full_pchat = await client(functions.messages.GetFullChatRequest(chat_id=pchat.id))
                if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
                   ttitle = full_pchat.chats[0].title
                if hasattr(full_pchat,'user') and full_pchat.user:
                    ttitle = full_pchat.user.first_name
-          img = await client.download_profile_photo(d.entity, message.get_sender_contact().addr)
+          img = await client.download_profile_photo(f_id, message.get_sender_contact().addr)
           await client.disconnect()
-          replies.add(text=ttitle, filename = img)
+          replies.add(text=ttitle, filename = img, quote=message)
     except:
        code = str(sys.exc_info())
        replies.add(text=code)
