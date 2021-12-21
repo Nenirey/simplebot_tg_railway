@@ -499,16 +499,30 @@ async def chat_info(bot, payload, replies, message):
           else:
              replies.add(text='No se encontró la referencia de este mensaje con el de Telegram', quote=message)
        else:
-          replies.add(text='Debe responder a un mensaje para mostrar información de este', quote=message)
+          #replies.add(text='Debe responder a un mensaje para mostrar información de este', quote=message)
           #TODO show chat information
-          #client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
-          #await client.connect()
-          #me = await client.get_me()
-          #my_id = me.id
-          #all_chats = await client.get_dialogs(ignore_migrated = True)
-          #img = await client.download_profile_photo(d.entity, message.get_sender_contact().addr)
-          #await client.disconnect()
-          #replies.add(text=chat_list)
+          client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
+          await client.connect()
+          await client.get_dialogs()
+          pchat = await client.get_input_entity(f_id)
+          if isinstance(pchat, types.InputPeerChannel):
+             full_pchat = await client(functions.channels.GetFullChannelRequest(channel = pchat))
+             if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
+                ttitle = full_pchat.chats[0].title
+          elif isinstance(pchat, types.InputPeerUser):
+               full_pchat = await client(functions.users.GetFullUserRequest(id = pchat))
+               if hasattr(full_pchat,'user') and full_pchat.user:
+                  ttitle = full_pchat.user.first_name
+          elif isinstance(pchat, types.InputPeerChat):
+               print('Hemos encontrado un InputPeerChat: '+str(uid))
+               full_pchat = await client(functions.messages.GetFullChatRequest(chat_id=pchat.id))
+               if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
+                  ttitle = full_pchat.chats[0].title
+               if hasattr(full_pchat,'user') and full_pchat.user:
+                   ttitle = full_pchat.user.first_name
+          img = await client.download_profile_photo(d.entity, message.get_sender_contact().addr)
+          await client.disconnect()
+          replies.add(text=ttitle, filename = img)
     except:
        code = str(sys.exc_info())
        replies.add(text=code)
