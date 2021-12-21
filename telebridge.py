@@ -50,7 +50,7 @@ bot_home = expanduser("~")
 white_list = None
 black_list = None
 
-MAX_AUTO_CHATS = 2
+MAX_AUTO_CHATS = 5
 MAX_SIZE_DOWN = 20485760
 MIN_SIZE_DOWN = 655360
 
@@ -533,7 +533,7 @@ async def chat_info(bot, payload, replies, message):
              img = None
              print("Error descargando foto de perfil de "+str(f_id))
           await client.disconnect()
-          replies.add(text=tinfo, html = "<code>"+str(full_pchat)+"</code>", filename = img, quote=message)
+          replies.add(text=tinfo, html = "<code>"+stringify(full_pchat)+"</code>", filename = img, quote=message)
     except:
        code = str(sys.exc_info())
        replies.add(text=code)
