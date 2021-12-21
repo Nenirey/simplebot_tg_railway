@@ -312,6 +312,8 @@ def deltabot_init(bot: DeltaBot) -> None:
     bot.commands.register(name = "/forward" ,func = async_forward_message)
     bot.commands.register(name = "/pin" ,func = async_pin_messages)
     bot.commands.register(name = "/news" ,func = async_chat_news)
+    bot.commands.register(name = "/info" ,func = async_chat_info)
+
 
 @simplebot.hookimpl
 def deltabot_start(bot: DeltaBot) -> None:
@@ -470,6 +472,50 @@ async def chat_news(bot, payload, replies, message):
 def async_chat_news(bot, payload, replies, message):
     """See a list of all your chats status/unread from telegram. Example: /news"""
     loop.run_until_complete(chat_news(bot, payload, replies, message))
+
+async def chat_info(bot, payload, replies, message):
+    dchat = message.chat.get_name()
+    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
+    if len(tg_ids)>0:
+       if tg_ids[-1].lstrip('-').isnumeric():
+          f_id = int(tg_ids[-1])
+       else:
+          f_id = tg_ids[-1]
+    else:
+       replies.add(text = 'Este no es un chat de telegram!')
+       return
+    if message.get_sender_contact().addr not in logindb:
+       replies.add(text = 'Debe iniciar sesión para ver información del chat!')
+       return
+    if message.get_sender_contact().addr not in chatdb:
+       chatdb[message.get_sender_contact().addr] = {}
+    try:
+       if not os.path.exists(message.get_sender_contact().addr):
+          os.mkdir(message.get_sender_contact().addr)
+       if message.quote:
+          t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)
+          if t_reply:
+             replies.add(text='Telegram message id: '+str(t_reply), quote=message)
+          else:
+             replies.add(text='No se encontró la referencia de este mensaje con el de Telegram', quote=message)
+       else:
+          replies.add(text='Debe responder a un mensaje para mostrar información de este', quote=message)
+          #TODO show chat information
+          #client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
+          #await client.connect()
+          #me = await client.get_me()
+          #my_id = me.id
+          #all_chats = await client.get_dialogs(ignore_migrated = True)
+          #img = await client.download_profile_photo(d.entity, message.get_sender_contact().addr)
+          #await client.disconnect()
+          #replies.add(text=chat_list)
+    except:
+       code = str(sys.exc_info())
+       replies.add(text=code)
+
+def async_chat_info(bot, payload, replies, message):
+    """Show message information from telegram. Example: reply a message with /info"""
+    loop.run_until_complete(chat_info(bot, payload, replies, message))
 
 async def pin_messages(message, replies):
     dchat = message.chat.get_name()
