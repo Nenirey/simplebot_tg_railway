@@ -506,11 +506,13 @@ async def chat_info(bot, payload, replies, message):
           await client.get_dialogs()
           pchat = await client.get_input_entity(f_id)
           tinfo =""
+          tinfo+="🆔️: "+str(full_pchat.id)
           if isinstance(pchat, types.InputPeerChannel):
              full_pchat = await client(functions.channels.GetFullChannelRequest(channel = pchat))
-             tinfo="🆔️: "+str(full_pchat.id)
              if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
                 tinfo += "\nTitulo: "+full_pchat.chats[0].title
+                if hasattr(full_pchat.chats[0],'participants_count') and full_pchat.chats[0].participants_count:
+                   tinfo += "\nParticipantes: "+str(full_pchat.chats[0].participants_count)
           elif isinstance(pchat, types.InputPeerUser):
                full_pchat = await client(functions.users.GetFullUserRequest(id = pchat))
                if hasattr(full_pchat,'user') and full_pchat.user:
