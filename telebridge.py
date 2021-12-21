@@ -1123,6 +1123,9 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                              reply_send_by = str((first_name + ' ' + last_name).strip())+": "
                           else:
                              reply_send_by = ""
+                          if mensaje[0].poll:
+                             if hasattr(mensaje[0].poll.poll, 'question') and mensaje[0].poll.poll.question:
+                                reply_text+='📊 '+mensaje[0].poll.poll.question
                           if hasattr(mensaje[0],'media') and mensaje[0].media:
                              if hasattr(mensaje[0].media,'photo'):
                                 reply_text += '[FOTO]'
