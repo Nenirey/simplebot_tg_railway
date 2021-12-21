@@ -1140,7 +1140,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               if hasattr(m,'action') and m.action:
                  mservice = '⚙\n'
                  if isinstance(m.action, types.MessageActionPinMessage):
-                    mservice += '_Ancló el mensaje_\n'
+                    mservice += '_📌Fijó el mensaje_\n'
                  elif isinstance(m.action, types.MessageActionChatAddUser):
                     mservice += '_Se unió al grupo_\n'
                  elif isinstance(m.action, types.MessageActionChatJoinedByLink):
@@ -1149,6 +1149,8 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                     mservice += '_Salió del grupo_\n'
                  elif isinstance(m.action, types.MessageActionChannelCreate):
                     mservice += '_Se creo el grupo/canal_\n'
+                 elif isinstance(m.action, types.MessageActionPhoneCall):
+                    mservice += '_📞Llamada_\n'
 
               #extract sender name
               if hasattr(m,'sender') and m.sender and hasattr(m.sender,'first_name') and m.sender.first_name:
