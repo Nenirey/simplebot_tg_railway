@@ -533,7 +533,7 @@ async def chat_info(bot, payload, replies, message):
              img = None
              print("Error descargando foto de perfil de "+str(f_id))
           await client.disconnect()
-          replies.add(text=tinfo, html = "<code>"+stringify(full_pchat)+"</code>", filename = img, quote=message)
+          replies.add(text=tinfo, html = "<code>"+str(full_pchat)+"</code>", filename = img, quote=message)
     except:
        code = str(sys.exc_info())
        replies.add(text=code)
