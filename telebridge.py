@@ -1866,10 +1866,10 @@ async def auto_load(bot, message, replies):
                    except:
                       code = str(sys.exc_info())
                       print(code)
-                   time.sleep(0.100)
+                   time.sleep(0.160)
         except:
            print('Error in autochatsdb dict')
-        time.sleep(15)
+        time.sleep(20)
 
 def start_updater(bot, message, replies):
     """Start scheduler updater to get telegram messages. /start"""
