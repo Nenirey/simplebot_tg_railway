@@ -1138,7 +1138,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
              all_messages = await client.get_messages(target, limit = 1)
           else:
              all_messages = await client.get_messages(target, limit = sin_leer)
-       print(str(contacto)+' '+str(dchat)+': '+str(len(all_messages)))
+       #print(str(contacto)+' '+str(dchat)+': '+str(len(all_messages)))
        if sin_leer>0 or load_history or show_id:
           all_messages.reverse()
        m_id = -0
@@ -1380,7 +1380,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
 
               #mark message as read
               m_id = m.id
-              print('Leyendo mensaje '+str(m_id))
+              #print('Leyendo mensaje '+str(m_id))
               dc_msg = myreplies.send_reply_messages()[0].id
               if file_attach!='' and os.path.exists(file_attach):
                  os.remove(file_attach)
