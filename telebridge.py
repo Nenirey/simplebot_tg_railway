@@ -405,7 +405,7 @@ async def convertsticker(infilepath,outfilepath):
 
     an = importer.process(infilepath)
     an.scale(128,128)
-    exporter.process(an, outfilepath, lossless=False, method=3, quality=50, skip_frames=8)
+    exporter.process(an, outfilepath, lossless=False, method=3, quality=50, skip_frames=16)
 
 async def chat_news(bot, payload, replies, message):
     if message.get_sender_contact().addr not in logindb:
