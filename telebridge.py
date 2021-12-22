@@ -50,7 +50,7 @@ bot_home = expanduser("~")
 white_list = None
 black_list = None
 
-MAX_AUTO_CHATS = 5
+MAX_AUTO_CHATS = 2
 MAX_SIZE_DOWN = 20485760
 MIN_SIZE_DOWN = 655360
 
