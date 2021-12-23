@@ -405,7 +405,7 @@ async def convertsticker(infilepath,outfilepath):
 
     an = importer.process(infilepath)
     an.scale(128,128)
-    exporter.process(an, outfilepath, lossless=False, method=3, quality=50, skip_frames=20)
+    exporter.process(an, outfilepath, lossless=False, method=3, quality=50, skip_frames=10)
 
 async def chat_news(bot, payload, replies, message):
     if message.get_sender_contact().addr not in logindb:
@@ -1866,10 +1866,10 @@ async def auto_load(bot, message, replies):
                    except:
                       code = str(sys.exc_info())
                       print(code)
-                   time.sleep(0.160)
+                   time.sleep(0.100)
         except:
            print('Error in autochatsdb dict')
-        time.sleep(20)
+        time.sleep(15)
 
 def start_updater(bot, message, replies):
     """Start scheduler updater to get telegram messages. /start"""
