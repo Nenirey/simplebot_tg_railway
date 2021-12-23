@@ -251,8 +251,10 @@ class AccountPlugin:
       @account_hookimpl
       def ac_chat_modified(self, chat):
           print('Chat modificado/creado: '+chat.get_name())
-          if DBXTOKEN:
-             backup_db()
+          if chat.is_group():
+             if get_tg_id(chat):
+                if DBXTOKEN:
+                   backup_db()
 
       @account_hookimpl
       def ac_process_ffi_event(self, ffi_event):
@@ -384,6 +386,18 @@ def find_register_msg(contacto, dc_id, tg_msg):
    else:
       return
 
+def get_tg_id(chat):
+    dchat = chat.get_name()
+    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
+    if len(tg_ids)>0:
+       if tg_ids[-1].lstrip('-').isnumeric():
+          f_id = int(tg_ids[-1])
+       else:
+          f_id = tg_ids[-1]
+       return f_id
+    else:
+       return None
+
 def print_dep_message(loader):
     if not loader.failed_modules:
         return
@@ -474,14 +488,8 @@ def async_chat_news(bot, payload, replies, message):
     loop.run_until_complete(chat_news(bot, payload, replies, message))
 
 async def chat_info(bot, payload, replies, message):
-    dchat = message.chat.get_name()
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       if tg_ids[-1].lstrip('-').isnumeric():
-          f_id = int(tg_ids[-1])
-       else:
-          f_id = tg_ids[-1]
-    else:
+    f_id = get_tg_id(message.chat)  
+    if not f_id:
        replies.add(text = 'Este no es un chat de telegram!')
        return
     if message.get_sender_contact().addr not in logindb:
