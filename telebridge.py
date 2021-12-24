@@ -192,6 +192,7 @@ def loadlogin():
        os.remove(LOGINFILE)
        for (key,_) in logindb.items():
            loop.run_until_complete(load_delta_chats(contacto=key))
+           time.sleep(10)
     else:
        print("File "+LOGINFILE+" not exists!!!")
 
