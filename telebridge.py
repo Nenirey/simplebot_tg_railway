@@ -275,6 +275,16 @@ def deltabot_incoming_message(message, replies) -> Optional[bool]:
     if black_list and message.get_sender_contact().addr in black_list:
        print('Usuario '+str(message.get_sender_contact().addr)+' esta en la lista negra')
        return True
+    if message.chat.is_group():
+       if get_tg_id(message.chat):
+          contactos = message.chat.get_contacts()
+          if len(contactos)>2:
+             if contactos.index(message.get_sender_contact())>1:
+                print('Mensaje de en un usuario no propietario del grupo')
+                return True
+       else:
+          print('Bot en un grupo que no es de telegram!')
+          return True
     return None
 
 @simplebot.hookimpl
