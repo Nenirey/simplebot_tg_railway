@@ -192,7 +192,7 @@ def loadlogin():
        os.remove(LOGINFILE)
        for (key,_) in logindb.items():
            loop.run_until_complete(load_delta_chats(contacto=key))
-           time.sleep(10)
+           time.sleep(5)
     else:
        print("File "+LOGINFILE+" not exists!!!")
 
@@ -501,18 +501,21 @@ async def chat_info(bot, payload, replies, message):
     try:
        if not os.path.exists(message.get_sender_contact().addr):
           os.mkdir(message.get_sender_contact().addr)
-       if message.quote:
-          t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)
-          if t_reply:
-             replies.add(text='Telegram message id: '+str(t_reply), quote=message)
-          else:
-             replies.add(text='No se encontró la referencia de este mensaje con el de Telegram', quote=message)
-       else:
-          #replies.add(text='Debe responder a un mensaje para mostrar información de este', quote=message)
-          #TODO show chat information
+       
+       if f_id:
+          #TODO show more chat information
           client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
           await client.connect()
           await client.get_dialogs()
+          if message.quote:
+             t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)         
+             if not t_reply:
+                replies.add(text='No se encontró la referencia de este mensaje con el de Telegram', quote=message)
+             else:
+                mensaje = await client.get_messages(f_id, ids=[t_reply])
+                replies.add(text='Mensaje id: '+str(t_reply), html=str(mensaje[0]), quote=message)
+             await client.disconnect()
+             return
           pchat = await client.get_input_entity(f_id)
           tinfo =""
           if isinstance(pchat, types.InputPeerChannel):
