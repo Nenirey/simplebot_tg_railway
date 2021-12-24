@@ -1395,7 +1395,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
                  if os.path.exists(bot_attach):
                     os.remove(bot_attach)
               limite+=1
-              register_msg(contacto, dc_id, dc_msg, m_id)
+              register_msg(contacto, int(dc_id), int(dc_msg), int(m_id))
               await m.mark_read()
            else:
               if not load_history and not is_auto:
