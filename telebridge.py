@@ -551,15 +551,12 @@ def async_chat_info(bot, payload, replies, message):
     loop.run_until_complete(chat_info(bot, payload, replies, message))
 
 async def pin_messages(message, replies):
-    dchat = message.chat.get_name()
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       if tg_ids[-1].lstrip('-').isnumeric():
-          f_id = int(tg_ids[-1])
-       else:
-          f_id = tg_ids[-1]
-    else:
-       replies.add(text = 'Este no es un chat de telegram!')
+    if not message.quote:
+       replies.add(text = "Debe responder a un mensaje para fijarlo")
+       return
+    f_id = get_tg_id(message.chat)
+    if not f_id:
+       replies.add(text = "Este no es un chat de telegram!")
        return
     try:
        client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
