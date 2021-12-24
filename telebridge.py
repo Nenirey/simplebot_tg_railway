@@ -519,17 +519,27 @@ async def chat_info(bot, payload, replies, message):
           client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
           await client.connect()
           await client.get_dialogs()
+          tinfo =""
+          img = None
           if message.quote:
              t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)         
              if not t_reply:
                 replies.add(text='No se encontró la referencia de este mensaje con el de Telegram', quote=message)
              else:
                 mensaje = await client.get_messages(f_id, ids=[t_reply])
-                replies.add(text='Mensaje id: '+str(t_reply), html=str(mensaje[0]), quote=message)
+                if mensaje and mensaje[0]:
+                   if mensaje[0].from_id:
+                      img = await client.download_profile_photo(mensaje[0].from_id.user_id)
+                      tinfo += "\nPor usuario id: "+str(mensaje[0].from_id.user_id)
+                   tinfo += "\nTelegram mensaje id: "+str(t_reply)
+                   tinfo += "\nDeltaChat mensaje id: "+str(message.quote.id)
+                   replies.add(text=tinfo, html=str(mensaje[0]), filename=img, quote=message)
+                else:
+                   replies.add(text="El mensaje fue eliminado?")
              await client.disconnect()
              return
           pchat = await client.get_input_entity(f_id)
-          tinfo =""
+          
           if isinstance(pchat, types.InputPeerChannel):
              full_pchat = await client(functions.channels.GetFullChannelRequest(channel = pchat))
              if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
@@ -1120,7 +1130,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        os.mkdir(contacto)
 
     try:
-       client = TC(StringSession(logindb[contacto]), api_id, api_hash, auto_reconnect=not is_auto)
+       client = TC(StringSession(logindb[contacto]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
        if id_chat.lstrip('-').isnumeric():
@@ -1193,7 +1203,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               #check if message is a reply
               if hasattr(m,'reply_to') and m.reply_to:
                  if hasattr(m.reply_to,'reply_to_msg_id') and m.reply_to.reply_to_msg_id:
-                    dc_mid = find_register_msg(contacto, dc_id, m.reply_to.reply_to_msg_id)
+                    dc_mid = find_register_msg(contacto, int(dc_id), m.reply_to.reply_to_msg_id)
                     if dc_mid:
                        try:
                           quote = bot.account.get_message_by_id(dc_mid)
