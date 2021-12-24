@@ -1104,7 +1104,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        os.mkdir(contacto)
 
     try:
-       client = TC(StringSession(logindb[contacto]), api_id, api_hash)
+       client = TC(StringSession(logindb[contacto]), api_id, api_hash, auto_reconnect=not is_auto)
        await client.connect()
        await client.get_dialogs()
        if id_chat.lstrip('-').isnumeric():
