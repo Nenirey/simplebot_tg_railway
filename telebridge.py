@@ -743,7 +743,7 @@ async def add_auto_chats(bot, replies, message):
                 autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
                 for (key,_) in autochatsdb[message.get_sender_contact().addr].items():
                     del autochatsdb[message.get_sender_contact().addr][key]
-                    replies.add(text='Solo se permiten automatizar hasta 5 chats, se ha automatizado este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer y se ha desactivado la automatizacion del chat '+str(bot.get_chat(key).get_name()))
+                    replies.add(text='Solo se permiten automatizar hasta 5 chats, se ha automatizado este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer y se ha desactivado la automatizacion del chat '+str(bot.get_chat(int(key)).get_name()))
                     break
              else:
                 autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
