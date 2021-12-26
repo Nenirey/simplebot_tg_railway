@@ -368,7 +368,6 @@ def register_msg(contacto, dc_id, dc_msg, tg_msg):
       messagedb[contacto] = {}
    if dc_id not in messagedb[contacto]:
       messagedb[contacto][dc_id] = {}
-
    messagedb[contacto][dc_id][dc_msg] = tg_msg
 
 def is_register_msg(contacto, dc_id, dc_msg):
@@ -630,14 +629,8 @@ async def forward_message(message, replies, payload):
     if message.get_sender_contact().addr not in logindb:
        replies.add(text = 'Debe iniciar sesión para reenviar mensajes!')
        return
-    dchat = message.chat.get_name()
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       if tg_ids[-1].lstrip('-').isnumeric():
-          f_id = int(tg_ids[-1])
-       else:
-          f_id = tg_ids[-1]
-    else:
+    f_id = get_tg_id(message.chat)
+    if not f_id:
        replies.add(text = 'Este no es un chat de telegram!')
        return
     parametros = payload.split()
@@ -695,22 +688,14 @@ async def add_auto_chats(bot, replies, message):
     if message.get_sender_contact().addr not in logindb:
        replies.add(text = 'Debe iniciar sesión para automatizar chats')
        return
-    dchat = message.chat.get_name()
-
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       id_chat=tg_ids[-1]
-    else:
+    target = get_tg_id(message.chat)
+    if not target:
        replies.add(text = 'Este no es un chat de telegram!')
        return
     try:
        client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
-       if id_chat.lstrip('-').isnumeric():
-          target = int(id_chat)
-       else:
-          target = id_chat
        is_channel = False
        is_user = False
        is_allowed = False
@@ -1084,23 +1069,14 @@ async def click_button(message, replies, payload):
     if len(parametros)<2:
        replies.add(text = 'Faltan parametros, debe proporcionar el id de mensaje y al menos el numero de columna')
        return
-    dchat = message.chat.get_name()
-
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       id_chat=tg_ids[-1]
-    else:
+    target = get_tg_id(message.chat)
+    if not target:
        replies.add(text = 'Este no es un chat de telegram!')
        return
-
     try:
        client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
-       if id_chat.lstrip('-').isnumeric():
-          target = int(id_chat)
-       else:
-          target = id_chat
        tchat = await client(functions.messages.GetPeerDialogsRequest(peers=[target] ))
        all_messages = await client.get_messages(target, ids = [int(parametros[0])])
        n_column = int(parametros[1])
@@ -1132,10 +1108,8 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        max_limit = 5
        is_down = message.text.lower().startswith('/down')
     myreplies = Replies(bot, logger=bot.logger)
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       id_chat=tg_ids[-1]
-    else:
+    target = get_tg_id(chat_id)
+    if not target:
        myreplies.add(text = 'Este no es un chat de telegram!', chat = chat_id)
        myreplies.send_reply_messages()
        return
@@ -1152,10 +1126,6 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        client = TC(StringSession(logindb[contacto]), api_id, api_hash, auto_reconnect=not is_auto)
        await client.connect()
        await client.get_dialogs()
-       if id_chat.lstrip('-').isnumeric():
-          target = int(id_chat)
-       else:
-          target = id_chat
        tchat = await client(functions.messages.GetPeerDialogsRequest(peers=[target] ))
        ttitle = 'Unknown'
        #extract chat title
@@ -1485,21 +1455,14 @@ async def echo_filter(message, replies):
        return
     dchat = message.chat.get_name()
 
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       id_chat=tg_ids[-1]
-    else:
+    target = get_tg_id(message.chat)
+    if not target:
        replies.add(text = 'Este no es un chat de telegram!')
        return
     try:
        client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
-       if id_chat.lstrip('-').isnumeric():
-          target = int(id_chat)
-       else:
-          target = id_chat
-
        mquote = ''
        t_reply = None
        if message.quote:
@@ -1558,22 +1521,15 @@ async def send_cmd(message, replies, payload):
     if message.get_sender_contact().addr not in logindb:
        replies.add(text = 'Debe iniciar sesión para enviar mensajes, use los comandos:\n/login SUNUMERO\no\n/token SUTOKEN para iniciar, use /help para ver la lista de comandos.')
        return
-    dchat = message.chat.get_name()
 
-    tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-    if len(tg_ids)>0:
-       id_chat=tg_ids[-1]
-    else:
+    target = get_tg_id(message.chat)
+    if not target:
        replies.add(text = 'Este no es un chat de telegram!')
        return
     try:
        client = TC(StringSession(logindb[message.get_sender_contact().addr]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
-       if id_chat.lstrip('-').isnumeric():
-          target = int(id_chat)
-       else:
-          target = id_chat
        t_reply = None
        if message.quote:
           t_reply = is_register_msg(message.get_sender_contact().addr, message.chat.id, message.quote.id)
