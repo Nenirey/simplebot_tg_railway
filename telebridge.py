@@ -529,10 +529,29 @@ async def chat_info(bot, payload, replies, message):
                 mensaje = await client.get_messages(f_id, ids=[t_reply])
                 if mensaje and mensaje[0]:
                    if mensaje[0].from_id:
+                      if isinstance(mensaje[0].from_id, types.PeerUser):
+                         full = await client(GetFullUserRequest(mensaje[0].from_id))
+                         tinfo += "Por usuario:"
+                      elif isinstance(mensaje[0].from_id, types.PeerChannel):
+                         full = await client(GetFullChannelRequest(mensaje[0].from_id))
+                         tinfo += "Por grupo/canal:"
+                      elif isinstance(mensaje[0].from_id, types.PeerChat):
+                         full = await client(GetFullChatRequest(mensaje[0].from_id))
+                         tinfo += "Por chat:"
+                      if full.user.username:
+                         tinfo += "\n@👤: @"+str(full.user.username)
+                      if full.user.first_name:
+                         tinfo += "\nNombre: "+str(full.user.first_name)
+                      if full.user.last_name:
+                         tinfo += "\nApellidos: "+str(full.user.last_name)
+                      tinfo += "\n🆔️: "+str(mensaje[0].from_id.user_id)
+                      if full.about:
+                         tinfo += "\nBiografia: "+str(full.about)
                       img = await client.download_profile_photo(mensaje[0].from_id.user_id)
-                      tinfo += "\nPor usuario id: "+str(mensaje[0].from_id.user_id)
+                   tinfo += "\n\nMensaje:"                     
                    tinfo += "\nTelegram mensaje id: "+str(t_reply)
                    tinfo += "\nDeltaChat mensaje id: "+str(message.quote.id)
+                   tinfo += "\nFecha de envio (UTC): "+str(mensaje[0].date)
                    replies.add(text=tinfo, html=str(mensaje[0]), filename=img, quote=message)
                 else:
                    replies.add(text="El mensaje fue eliminado?")
@@ -1435,8 +1454,9 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        await client.disconnect()
     except:
        code = str(sys.exc_info())
-       myreplies.add(text=code, chat = chat_id)
-       myreplies.send_reply_messages()
+       if not is_auto:
+          myreplies.add(text=code, chat = chat_id)
+          myreplies.send_reply_messages()
 
 
 def async_load_chat_messages(bot, message, replies, payload):
