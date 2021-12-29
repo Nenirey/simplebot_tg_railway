@@ -720,18 +720,18 @@ async def add_auto_chats(bot, replies, message):
           #{contact_addr:{chat_id:chat_type}}
           if message.get_sender_contact().addr not in autochatsdb:
              autochatsdb[message.get_sender_contact().addr]={}
-          if message.chat.id in autochatsdb[message.get_sender_contact().addr]:
-             del autochatsdb[message.get_sender_contact().addr][message.chat.id]
+          if str(message.chat.id) in autochatsdb[message.get_sender_contact().addr]:
+             del autochatsdb[message.get_sender_contact().addr][str(message.chat.id)]
              replies.add(text='Se ha desactivado la automatizacion en este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer!')
           else:
              if len(autochatsdb[message.get_sender_contact().addr])>=MAX_AUTO_CHATS and not bot.is_admin(message.get_sender_contact()):
-                autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
+                autochatsdb[message.get_sender_contact().addr][str(message.chat.id)]=target
                 for (key,_) in autochatsdb[message.get_sender_contact().addr].items():
-                    del autochatsdb[message.get_sender_contact().addr][key]
+                    del autochatsdb[message.get_sender_contact().addr][str(key)]
                     replies.add(text='Solo se permiten automatizar hasta 5 chats, se ha automatizado este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer y se ha desactivado la automatizacion del chat '+str(bot.get_chat(int(key)).get_name()))
                     break
              else:
-                autochatsdb[message.get_sender_contact().addr][message.chat.id]=target
+                autochatsdb[message.get_sender_contact().addr][str(message.chat.id)]=target
                 replies.add(text='Se ha automatizado este chat ('+str(len(autochatsdb[message.get_sender_contact().addr]))+' de '+str(MAX_AUTO_CHATS)+'), tiene '+str(sin_leer)+' mensajes sin leer!')
        else:
           replies.add(text='Solo se permite automatizar chats privados, canales y algunos grupos permitidos por ahora')
@@ -832,7 +832,7 @@ def remove_chat(payload, replies, message):
           if message.get_sender_contact().addr in autochatsdb:
              for (key, value) in autochatsdb[message.get_sender_contact().addr].items():
                  if str(value) == target:
-                    del autochatsdb[message.get_sender_contact().addr][key]
+                    del autochatsdb[message.get_sender_contact().addr][str(key)]
                     replies.add(text = 'Se desactivaron las actualizaciones para el chat '+str(key))
        except:
           print('Dictionary change size...')
@@ -1123,7 +1123,7 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        os.mkdir(contacto)
 
     try:
-       client = TC(StringSession(logindb[contacto]), api_id, api_hash, auto_reconnect=not is_auto)
+       client = TC(StringSession(logindb[contacto]), api_id, api_hash)
        await client.connect()
        await client.get_dialogs()
        tchat = await client(functions.messages.GetPeerDialogsRequest(peers=[target] ))
