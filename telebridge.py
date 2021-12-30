@@ -563,7 +563,7 @@ async def chat_info(bot, payload, replies, message):
              if hasattr(full_pchat,'chats') and full_pchat.chats and len(full_pchat.chats)>0:
                 tinfo += "\nTitulo: "+full_pchat.chats[0].title
                 if hasattr(full_pchat.chats[0],'participants_count') and full_pchat.chats[0].participants_count:
-                   tinfo += "\nParticipantes: "+str(full_pchat.chats[0].participants_count)
+                   tinfo += "\nParticipantes: "+str(full_pchat.chats[0].participants_count)             
           elif isinstance(pchat, types.InputPeerUser):
                full_pchat = await client(functions.users.GetFullUserRequest(id = pchat))
                if hasattr(full_pchat,'user') and full_pchat.user:
@@ -736,7 +736,7 @@ async def add_auto_chats(bot, replies, message):
        else:
           replies.add(text='Solo se permite automatizar chats privados, canales y algunos grupos permitidos por ahora')
     else:
-       replies.add('Este no es un chat de Telegram!')
+       replies.add(text='Este no es un chat de Telegram!')
 
 
 def async_add_auto_chats(bot, replies, message):
@@ -1608,58 +1608,61 @@ async def inline_cmd(bot, message, replies, payload):
                     for e in r.message.entities:
                         if hasattr(e,'url') and e.url:
                            resultado+=str(e.url)+'\n'
-              try:
-                 if hasattr(r,'document') and r.document:
-                    attach = await client.download_media(r.document, contacto)
-              except:
-                 print('Error descargando inline document result')
 
               if attach == '':
                  try:
+                    if hasattr(r,'document') and r.document:
+                       attach = await client.download_media(r.document, contacto)
+                       try:
+                          if attach.lower().endswith('.webp'):
+                             tipo = 'sticker'
+                          if attach.lower().endswith('.tgs'):
+                             filename, file_extension = os.path.splitext(attach)
+                             attach_converted = filename+'.webp'
+                             await convertsticker(attach,attach_converted)
+                             attach = attach_converted
+                             tipo = 'sticker'               
+                       except:
+                          print('error convirtiendo sticker')
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
+                       tipo = None
+                 except:
+                    print('Error descargando inline document result')
+                 try:
                     if hasattr(r,'photo') and r.photo:
                        attach = await client.download_media(r.photo, contacto)
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
                  except:
                     print('Error descargando inline photo result')
                  try:
                     if hasattr(r,'gif') and r.gif:
                        attach = await client.download_media(r.gif, contacto)
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
                  except:
                     print('Error descargando inline gif result')
                  try:
                     if hasattr(r,'video') and r.video:
                        attach = await client.download_media(r.video, contacto)
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
                  except:
                     print('Error descargando inline video result')
                  try:
                     if hasattr(r,'mpeg4_gif') and r.mpeg4_gif:
                        attach = await client.download_media(r.mpeg4_gif, contacto)
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
                  except:
                     print('Error descargando inline mpeg4_gif result')
                  try:
                     if hasattr(r,'audio') and r.audio:
                        attach = await client.download_media(r.audio, contacto)
+                       replies.add(text = resultado, filename=attach, viewtype=tipo)
                  except:
                     print('Error descargando inline audio result')
-              try:
-                 if attach.lower().endswith('.webp'):
-                    tipo = 'sticker'
-                 if attach.lower().endswith('.tgs'):
-                    filename, file_extension = os.path.splitext(attach)
-                    attach_converted = filename+'.webp'
-                    await convertsticker(attach,attach_converted)
-                    attach = attach_converted
-                    tipo = 'sticker'
-              except:
-                 print('error convirtiendo sticker')
-
-              replies.add(text = resultado, filename=attach, viewtype=tipo)
-              resultado+='\n\n'
               limite +=1
            else:
               break
        await client.disconnect()
     except:
-       #await client(SendMessageRequest(target, payload))
        code = str(sys.exc_info())
        if bot.is_admin(contacto):
          replies.add(text=code)
