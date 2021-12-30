@@ -1,4 +1,4 @@
-# simplebot_tg_railway
+# simplebot_tg_railwa
 Telegram/DeltaChat Bridge, is a plugin for https://github.com/simplebot-org/simplebot
 
 ## Demo Bot
