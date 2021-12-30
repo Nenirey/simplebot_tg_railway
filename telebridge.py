@@ -532,10 +532,10 @@ async def chat_info(bot, payload, replies, message):
                          full = await client(GetFullUserRequest(mensaje[0].from_id))
                          tinfo += "Por usuario:"
                       elif isinstance(mensaje[0].from_id, types.PeerChannel):
-                         full = await client(GetFullChannelRequest(mensaje[0].from_id))
+                         full = await client(functions.channels.GetFullChannelRequest(channel = mensaje[0].from_id))
                          tinfo += "Por grupo/canal:"
                       elif isinstance(mensaje[0].from_id, types.PeerChat):
-                         full = await client(GetFullChatRequest(mensaje[0].from_id))
+                         full = await client(functions.messages.GetFullChatRequest(chat_id = mensaje[0].from_id))
                          tinfo += "Por chat:"
                       if full.user.username:
                          tinfo += "\n@👤: @"+str(full.user.username)
@@ -808,12 +808,11 @@ def remove_chat(payload, replies, message):
     if message.get_sender_contact().addr not in chatdb:
        replies.add(text = 'No tiene ningun chat vinculado!')
        return
-    target = ''
     if not payload or payload =='':
-       dchat = message.chat.get_name()
-       tg_ids = re.findall(r"\[([\-A-Za-z0-9_]+)\]", dchat)
-       if len(tg_ids)>0:
-          target = tg_ids[-1]
+       target = get_tg_id(message.chat)
+       if not target:
+          replies.add(text = 'Este no es un chat de Telegram!')
+          return
     else:
        target = payload.replace(' ','_')
     if target == 'all':
@@ -1576,16 +1575,7 @@ async def inline_cmd(bot, message, replies, payload):
     else:
        replies.add(text = 'Debe proporcionar el nombre del bot y el termino de búsqueda, ejemplo: /inline gif gaticos\nAqui hay otros ejemplos probados:\n'+example_inline)
        return
-    if contacto in chatdb and str(message.chat.get_name()) in chatdb[contacto].values():
-       for (key, value) in chatdb[contacto].items():
-           if value == str(message.chat.get_name()):
-              if key.lstrip('-').isnumeric():
-                 target = int(key)
-              else:
-                 target = key
-              break
-    else:
-       target = None
+    target = get_tg_id(message.chat)
     try:
        client = TC(StringSession(logindb[contacto]), api_id, api_hash)
        await client.connect()
