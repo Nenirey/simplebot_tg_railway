@@ -766,8 +766,8 @@ async def save_delta_chats(replies, message):
        tf.close()
        await client.connect()
        my_id = await client(functions.users.GetFullUserRequest('me'))
-       if my_id.pinned_msg_id:
-          my_pin = await client.get_messages('me', ids=my_id.pinned_msg_id)
+       if my_id.full_user.pinned_msg_id:
+          my_pin = await client.get_messages('me', ids=my_id.full_user.pinned_msg_id)
           await client.edit_message('me',my_pin,'!!!Atención, este mensaje es parte del puente con deltachat, NO lo borre ni lo quite de los anclados o perdera el vinculo con telegram\n'+str(datetime.now()), file = message.get_sender_contact().addr+'.json')
        else:
           my_new_pin = await client.send_file('me', message.get_sender_contact().addr+'.json')
