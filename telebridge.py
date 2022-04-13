@@ -1354,6 +1354,8 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        await client.get_dialogs()
        tchat = await client(functions.messages.GetPeerDialogsRequest(peers=[target] ))
        ttitle = 'Unknown'
+       me = await client.get_me()
+       my_id = me.id
        #extract chat title
        if hasattr(tchat,'chats') and tchat.chats:
           ttitle = tchat.chats[0].title
@@ -1392,6 +1394,12 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
        m_id = -1
        dc_msg = -1
        for m in all_messages:
+           if hasattr(m,'peer_id') and m.peer_id:
+              if hasattr(m.peer_id,'user_id') and m.peer_id.user_id:
+                 if my_id == m.peer_id.user_id:
+                    ttitle = "Mensajes guardados"
+                    if is_auto:
+                       continue
            if m and limite<max_limit:
               mquote = ''
               quote = None
@@ -1567,10 +1575,10 @@ async def load_chat_messages(bot: DeltaBot, message = Message, replies = Replies
               if hasattr(m,'via_bot_id') and m.via_bot_id:
                  full_bot = await client(functions.users.GetFullUserRequest(id = m.via_bot_id))
                  if CAN_IMP:
-                    send_by += " via @"+full_bot.users[0].username
+                    sender_name += " via @"+full_bot.users[0].username
                  else:
-                    send_by = send_by.replace(':\n',' ')
-                    send_by += "via @"+full_bot.users[0].username+":\n"
+                    sender_name = sender_name.replace(':\n',' ')
+                    sender_name += "via @"+full_bot.users[0].username+":\n"
 
               #check if message have buttons
               if hasattr(m,'reply_markup') and m.reply_markup and hasattr(m.reply_markup,'rows'):
